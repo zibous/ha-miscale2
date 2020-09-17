@@ -90,32 +90,31 @@ Systemd service for  - on systemd powered systems the **recommended** option
 
 
 # Acknowledgements:
-Thanks @lolouk44 to https://github.com/lolouk44/xiaomi_mi_scale
-Formulas to calculate the various values/measures, I've got them from https://github.com/wiecosystem/Bluetooth
++ Thanks @lolouk44 to https://github.com/lolouk44/xiaomi_mi_scale<br>
++ Formulas to calculate the various values/measures, I've got them from https://github.com/wiecosystem/Bluetooth
 
 
 # Informations
-https://www.wikihow.fitness/Determine-Lean-Body-Mass
-https://www.omnicalculator.com/health/body-fat#how-to-calculate-body-fat
-https://calculator-online.net/ideal-weight-calculator/
-https://en.wikipedia.org/wiki/Body_mass_index
-https://www.calculator.net/bmi-calculator.html
-https://www.calculator.net/calorie-calculator.html
-https://www.omnicalculator.com/health/bmr-katch-mcardle#what-is-the-katch-mcardle-calculator
-https://www.omnicalculator.com/health/maintenance-calorie
-https://en.wikipedia.org/wiki/Body_water
-https://en.wikipedia.org/wiki/Body_fat_percentage
-https://en.wikipedia.org/wiki/Lean_body_mass
-https://en.wikipedia.org/wiki/Lean_body_mass
-https://www.calculator.net/lean-body-mass-calculator.html
-http://www.dev.egofit.de/biadata-org/
-https://github.com/zewelor/bt-mqtt-gateway
-https://www.mi.com/global/mi-body-composition-scale
-https://dev.to/henrylim96/reading-xiaomi-mi-scale-data-with-web-bluetooth-scanning-api-1mb9
-https://github.com/Wingjam/ReverseMiScale/blob/master/miScale.py
-https://tanita.de/hilfe-und-anleitungen/richtige-interpretation-ihrer-messwerte/
+- https://www.wikihow.fitness/Determine-Lean-Body-Mass<br>
+- https://www.omnicalculator.com/health/body-fat#how-to-calculate-body-fat<br>
+- https://calculator-online.net/ideal-weight-calculator/<br>
+- https://en.wikipedia.org/wiki/Body_mass_index<br>
+- https://www.calculator.net/bmi-calculator.html<br>
+- https://www.calculator.net/calorie-calculator.html<br>
+- https://www.omnicalculator.com/health/bmr-katch-mcardle#what-is-the-katch-mcardle-calculator<br>
+- https://www.omnicalculator.com/health/maintenance-calorie<br>
+- https://en.wikipedia.org/wiki/Body_water<br>
+- https://en.wikipedia.org/wiki/Body_fat_percentage<br>
+- https://en.wikipedia.org/wiki/Lean_body_mass<br>
+- https://www.calculator.net/lean-body-mass-calculator.html<br>
+- http://www.dev.egofit.de/biadata-org/<br>
+- https://github.com/zewelor/bt-mqtt-gateway<br>
+- https://www.mi.com/global/mi-body-composition-scale<br>
+- https://dev.to/henrylim96/reading-xiaomi-mi-scale-data-with-web-bluetooth-scanning-api-1mb9<br>
+- https://github.com/Wingjam/ReverseMiScale/blob/master/miScale.py<br>
+- https://tanita.de/hilfe-und-anleitungen/richtige-interpretation-ihrer-messwerte/<br>
 
 # Omron, Medisana, Xiaomi
-https://www.amazon.de/Omron-HBF-511B-E-Ganzkörperanalyse-Waage-BF511-blau/dp/B0033AGBW0
-https://www.amazon.de/Medisana-TargetScale-3-0-Waage/dp/B01MZ1VBWZ/
-https://www.amazon.de/Xiaomi-Smart-Bluetooth-Monitor-Display/dp/B07WNM9B57/
+- https://www.amazon.de/Omron-HBF-511B-E-Ganzkörperanalyse-Waage-BF511-blau/dp/B0033AGBW0<br>
+- https://www.amazon.de/Medisana-TargetScale-3-0-Waage/dp/B01MZ1VBWZ/<br>
+- https://www.amazon.de/Xiaomi-Smart-Bluetooth-Monitor-Display/dp/B07WNM9B57/<br>
