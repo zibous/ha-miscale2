@@ -8,24 +8,22 @@ Code to read weight measurements from Xiaomi Body Scales.
 An MQTT broker is needed as the counterpart for this daemon. Even though an MQTT-less mode is provided, it is not recommended for normal smart home automation integration. MQTT is huge help in connecting different parts of your smart home and setting up of a broker is quick and easy.
 
 
-
 ## Installation
 
 On a modern Linux system just a few steps are needed to get the daemon working. The following example shows the installation under Debian/Raspbian below the `/opt` directory:
 
 
-
 ```bash
-$ git clone https://github.com/zibous/ha-miscale.git /opt/ha-miscale
-$ cd /opt/ha-miscale
+$ git clone https://github.com/zibous/ha-miscale2.git
+$ cd /opt/ha-miscale2
 $ sudo pip3 install -r requirements.txt
 
 ```
 
-To match personal needs, all operation details can be configured using the file **config.py** The file needs to be created first:
+To match personal needs, all operation details can be configured using the file **conf.py** The file needs to be created first:
 
 ```bash
-$ cd /opt/ha-miscale
+$ cd /opt/ha-miscale2
 $ cp conf.py.dist conf.py
 $ nano conf.py
 
@@ -64,16 +62,28 @@ You most probably want to execute the program **continuously in the background**
 
 **Attention:** Daemon mode must be enabled in the configuration file (default).
 
-1. Systemd service - on systemd powered systems the **recommended** option
+Systemd service for  - on systemd powered systems the **recommended** option
 
+### Application Service:
    ```bash
-   sudo cp /opt/ha-miscale/service_app.template /etc/systemd/system/ha-miscale.service
+   sudo cp /opt/ha-miscale2/service_app.template /etc/systemd/system/ha-miscale.service
    
    sudo systemctl daemon-reload
    sudo systemctl start ha-miscale.service
    sudo systemctl status ha-miscale.service
    
    sudo systemctl enable ha-miscale.service
+   ```
+
+### MQTT Service:
+   ```bash
+   sudo cp /opt/ha-miscale2/service_mqtt.template /etc/systemd/system/ha-miscale-mqtt.service
+   
+   sudo systemctl daemon-reload
+   sudo systemctl start ha-miscale-mqtt.service
+   sudo systemctl status ha-miscale-mqtt.service
+   
+   sudo systemctl enable ha-miscale-mqtt.service
    ```
 
 
@@ -102,9 +112,7 @@ http://www.dev.egofit.de/biadata-org/
 https://github.com/zewelor/bt-mqtt-gateway
 https://www.mi.com/global/mi-body-composition-scale
 https://dev.to/henrylim96/reading-xiaomi-mi-scale-data-with-web-bluetooth-scanning-api-1mb9
-
 https://github.com/Wingjam/ReverseMiScale/blob/master/miScale.py
-
 https://tanita.de/hilfe-und-anleitungen/richtige-interpretation-ihrer-messwerte/
 
 # Omron, Medisana, Xiaomi
