@@ -32,6 +32,8 @@ To match personal needs, all operation details can be configured using the file 
 ```bash
 $ cd /opt/ha-miscale2
 $ cp conf.py.dist conf.py
+
+# edit configuration settings
 $ nano conf.py
 
 $ chmod +x app.py
@@ -70,25 +72,27 @@ Systemd service for  - on systemd powered systems the **recommended** option
 
 ### Application Service:
    ```bash
-   sudo cp /opt/ha-miscale2/service_app.template /etc/systemd/system/ha-miscale.service
+   $ sudo cp /opt/ha-miscale2/service_app.template /etc/systemd/system/ha-miscale.service
    
-   sudo systemctl daemon-reload
-   sudo systemctl start ha-miscale.service
-   sudo systemctl status ha-miscale.service
+   $ sudo systemctl daemon-reload
+   $ sudo systemctl start ha-miscale.service
+   $ sudo systemctl status ha-miscale.service
    
-   sudo systemctl enable ha-miscale.service
+   $ sudo systemctl enable ha-miscale.service
    ```
 
 ### MQTT Service:
    ```bash
-   sudo cp /opt/ha-miscale2/service_mqtt.template /etc/systemd/system/ha-miscale-mqtt.service
+   $ sudo cp /opt/ha-miscale2/service_mqtt.template /etc/systemd/system/ha-miscale-mqtt.service
    
-   sudo systemctl daemon-reload
-   sudo systemctl start ha-miscale-mqtt.service
-   sudo systemctl status ha-miscale-mqtt.service
+   $ sudo systemctl daemon-reload
+   $ sudo systemctl start ha-miscale-mqtt.service
+   $ sudo systemctl status ha-miscale-mqtt.service
    
-   sudo systemctl enable ha-miscale-mqtt.service
+   $ sudo systemctl enable ha-miscale-mqtt.service
    ```
+
+
 
 <hr>
 
