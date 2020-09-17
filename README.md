@@ -59,8 +59,6 @@ https://github.com/1technophile/OpenMQTTGateway
 
 You most probably want to execute the program **continuously in the background**. This can be done either by using the internal daemon or cron.
 
-**Attention:** Daemon mode must be enabled in the configuration file (default).
-
 Systemd service for  - on systemd powered systems the **recommended** option
 
 ### Application Service:
@@ -85,8 +83,7 @@ Systemd service for  - on systemd powered systems the **recommended** option
    sudo systemctl enable ha-miscale-mqtt.service
    ```
 
-
-
+<hr>
 
 # Acknowledgements:
 + Thanks @lolouk44 to https://github.com/lolouk44/xiaomi_mi_scale<br>
