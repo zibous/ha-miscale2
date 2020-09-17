@@ -44,9 +44,8 @@ $ ./mqttservice.py
 
 Read [Xiaomi Mi Body Composition Scale](https://www.mi.com/global/mi-body-composition-scale) data from a Raspberry Pi in Python 3.
 
-`python3 app.py`
-
 ### Execution
+`python3 app.py`
 
 ## MQTT service for ESP32 Devices
 A simple Python script which provides a MQTT gateway for ESP Devices, easily extensible via custom workers. Application for ESP Devices see:
