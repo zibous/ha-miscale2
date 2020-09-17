@@ -18,10 +18,6 @@ except Exception as e:
 
 log = logger.Log(__name__, LOG_LEVEL)
 
-# global OLD_MITIME
-# OLD_MITIME = str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-
-
 class Miscale2Decoder():
 
     resultData = None
