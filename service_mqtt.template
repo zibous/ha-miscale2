@@ -1,0 +1,20 @@
+[Unit]
+Description=Bodyscale MQTT Service
+Documentation=https://github.com/zibous/ha-smartmeter
+After=network.target
+
+[Service]
+Type=notify
+User=daemon
+Group=daemon
+WorkingDirectory=/opt/ha-miscale/
+ExecStart=/usr/bin/python3 /opt/mi-scale/mqttservice.py
+StandardOutput=null
+#StandardOutput=syslog
+#SyslogIdentifier=miscale
+StandardError=journal
+Environment=PYTHONUNBUFFERED=true
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
