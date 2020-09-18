@@ -125,7 +125,7 @@ USER2_LT = 60
 USER2_SEX = "female"
 USER2_NAME = "Reni"
 USER2_HEIGHT = 168
-USER2_ATHLETIC = True
+USER2_ATHLETIC = False
 USER2_DOB = "2004-01-02"
 USER2_SCORES = {
     "WEIGHT": 54.00,
@@ -137,25 +137,8 @@ USER2_SCORES = {
     "BMR": 1850,
     "PROTEIN": 18.00
 }
-USER2_ADJUSTMENTS = {
-    "77": {"fat": 0.756, "visceral": 0.545, "water": 1.187, "bone": 1.276, "muscle": 0.758},
-    "78": {"fat": 0.766, "visceral": 0.552, "water": 1.186, "bone": 1.271, "muscle": 0.750},
-    "76": {"fat": 0.745, "visceral": 0.536, "water": 1.188, "bone": 1.285, "muscle": 0.767},
-    "75": {"fat": 0.736, "visceral": 0.530, "water": 1.190, "bone": 1.294, "muscle": 0.777},
-    "74": {"fat": 0.638, "visceral": 0.460, "water": 1.045, "bone": 1.312, "muscle": 0.823},
-    "73": {"fat": 0.634, "visceral": 0.457, "water": 1.044, "bone": 1.317, "muscle": 0.823},
-    "72": {"fat": 0.593, "visceral": 0.427, "water": 1.052, "bone": 1.321, "muscle": 0.839},
-    "71": {"fat": 0.604, "visceral": 0.435, "water": 1.044, "bone": 1.331, "muscle": 0.845},
-    "70": {"fat": 0.587, "visceral": 0.423, "water": 1.044, "bone": 1.304, "muscle": 0.857},
-    "69": {"fat": 0.586, "visceral": 0.422, "water": 1.044, "bone": 1.304, "muscle": 0.858},
-    "68": {"fat": 0.566, "visceral": 0.408, "water": 1.217, "bone": 1.300, "muscle": 0.883},
-    "67": {"fat": 0.552, "visceral": 0.398, "water": 1.215, "bone": 1.304, "muscle": 0.895},
-    "66": {"fat": 0.542, "visceral": 0.390, "water": 1.040, "bone": 1.328, "muscle": 0.906},
-    "65": {"fat": 0.528, "visceral": 0.380, "water": 1.039, "bone": 1.296, "muscle": 0.919},
-    "64": {"fat": 0.508, "visceral": 0.366, "water": 1.035, "bone": 1.306, "muscle": 0.936},
-    "63": {"fat": 0.491, "visceral": 0.354, "water": 1.035, "bone": 1.311, "muscle": 0.945},
-    "62": {"fat": 0.560, "visceral": 0.403, "water": 1.014, "bone": 1.326, "muscle": 0.948}
-}
+USER2_ADJUSTMENTS = None
+    
 
 USER3_SEX = "female"
 USER3_NAME = "Tina"
@@ -172,7 +155,7 @@ USER3_SCORES = {
     "BMR": 1800,
     "PROTEIN": 18.00
 }
-
+USER3_ADJUSTMENTS = None
 
 """SETTINGS data logger
 """

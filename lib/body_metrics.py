@@ -153,11 +153,17 @@ class bodyMetrics:
         return self.checkValueOverflow(muscleMass, 10, 120)
 
     # Get Visceral Fat
+    # modified by peter siebler
     def getVisceralFat(self):
         if self.sex == 'female':
             if self.weight > (13 - (self.height * 0.5)) * -1:
                 subsubcalc = ((self.height * 1.45) + (self.height * 0.1158) * self.height) - 120
                 subcalc = self.weight * 500 / subsubcalc
+                vfal = (subcalc - 6) + (self.age * 0.07)
+            elif self.weight<65:   
+                # add this to get values
+                subsubcalc = ((self.height * 1.45) + (self.height * 0.1158) * self.height) - self.weight
+                subcalc = self.weight * 460 / subsubcalc
                 vfal = (subcalc - 6) + (self.age * 0.07)
             else:
                 subcalc = 0.691 + (self.height * -0.0024) + (self.height * -0.0024)
@@ -167,8 +173,10 @@ class bodyMetrics:
                 subcalc = ((self.height * 0.4) - (self.height * (self.height * 0.0826))) * -1
                 vfal = ((self.weight * 305) / (subcalc + 48)) - 2.9 + (self.age * 0.15)
             else:
+                # modified to get better results
                 subcalc = 0.765 + self.height * -0.0015
-                vfal = (((self.height * 0.143) - (self.weight * subcalc)) * -1) + (self.age * 0.15) - 5.0
+                # vfal = (((self.height * 0.143) - (self.weight * subcalc)) * -1) + (self.age * 0.15) - 5.60
+                vfal = (((self.height * 0.143) - (self.weight * subcalc)) * -1) + (16.00 * 0.15) - 5.60
 
         return self.checkValueOverflow(vfal, 1, 50)
 

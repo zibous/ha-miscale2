@@ -39,7 +39,7 @@ def libcheck():
 
 
 def testcase1():
-    data = {
+    data_peter = {
         "measured": 70.65,
         "calcweight": 70.65,
         "unit": 'kg',
@@ -47,8 +47,20 @@ def testcase1():
         "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
         "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
     }
+
+    data_reni = {
+        "measured": 49.50,
+        "calcweight": 49.50,
+        "unit": 'kg',
+        "impedance": 495,
+        "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
+        "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+    }
+    
+    data = data_peter
+
     log.info('Calcluation based on data:{}'.format(data))
-    mCalc = calcdata.CalcData(data, True)
+    mCalc = calcdata.CalcData(data,True)
     mi_data = mCalc.getData('data')
     if mCalc.ready:
         # publish to mqtt
@@ -90,7 +102,7 @@ def testcase2():
             "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
             "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
         }
-        mCalc = calcdata.CalcData(miscale_peter, False)
+        mCalc = calcdata.CalcData(miscale_peter)
         result = mCalc.getData('full', 'data')
 
         y = result['fat']

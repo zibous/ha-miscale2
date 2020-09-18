@@ -29,7 +29,7 @@ class CalcData():
 
     version = '1.0.0'
 
-    def __init__(self, data: dict = None, useAgeCalc: bool = False):
+    def __init__(self, data: dict = None, useAgeCalc: bool = True):
         self.useAgeCalc = useAgeCalc
         # current user settings
         self.user = 'default'
@@ -105,12 +105,15 @@ class CalcData():
         if self.adjustments and self.athletic:
             idx = self.round_to_value(self.weight)
             if idx in self.adjustments:
+                log.debug('Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))    
                 cf = self.adjustments[idx]
                 self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
-                self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
+                #self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
                 self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
                 self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
                 # self.data['muscle'] = round(float(self.data['muscle'])*float(cf['muscle']),2)
+            else:
+                log.debug('No calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))    
 
     def __getAge__(self) -> float:
         try:
@@ -260,7 +263,7 @@ class CalcData():
                 # allready calculated
                 return True
 
-            log.debug("Set Body Metrics data for {}".format(self.user))
+            log.debug("Set Body Metrics data for {}, Weight:{}".format(self.user,self.weight))
             # Körperfettanteil + Knochenmasse + Muskelmasse = 100 % der Körperzusammensetzung
             lib = body_metrics.bodyMetrics(self.weight, self.height, self.age, self.impedance, self.sex)
 
@@ -289,6 +292,7 @@ class CalcData():
                 self.data['idealfat'] = self.userscores['FAT']
             else:
                 self.data['idealfat'] = round(lib.getFatMassToIdeal()['mass'], 2)
+
             self.data['visceral'] = round(lib.getVisceralFat(), 2)
 
             # water, bone, muscle, protein
@@ -309,7 +313,7 @@ class CalcData():
 
         except Exception as e:
             log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
-            return False
+            pass
 
     def setBodyScores(self):
         try:
@@ -370,6 +374,7 @@ class CalcData():
     def publishdata(self):
         # publish the body metrics data for the current user
         self.__setBodyMetricsdata__()
+
         self.data["icon"] = "mdi:scale-bathroom"
         self.data['attribution'] = ATTRIBUTION
         topic = "{}/{}/data".format(MQTT_PREFIX, self.user)
