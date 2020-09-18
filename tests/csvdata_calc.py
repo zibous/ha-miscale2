@@ -43,7 +43,7 @@ def round_to_value(number,roundto:float=0.5):
 
 def calcRecalibrate():
     variables_file = '../data/gewichtsdaten.csv'
-    reader = csv.DictReader(open(variables_file, 'r'), delimiter=';')
+    reader = csv.DictReader(open(variables_file, 'r'), delimiter=',')
     dict_list = []
     for line in reader:
         dict_list.append(line)
@@ -85,7 +85,7 @@ def calcRecalibrate():
 
 def testcase1():
     variables_file = '../data/gewichtsdaten.csv'
-    reader = csv.DictReader(open(variables_file, 'r'), delimiter=';')
+    reader = csv.DictReader(open(variables_file, 'r'), delimiter=',')
     dict_list = []
     for line in reader:
         dict_list.append(line)

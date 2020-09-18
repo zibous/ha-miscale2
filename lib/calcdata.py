@@ -15,6 +15,7 @@ try:
     from conf import *
     from lib import logger
     from lib import body_metrics
+    from lib import body_score
     from lib import influxdata
 
 except Exception as e:
@@ -37,7 +38,7 @@ class CalcData():
         self.age = 18
         self.sex = 'male'
         self.athletic = False
-        self.targetweight = 70.00
+        self.userscores = None
         self.adjustments = None
         self.userid = "none"
         self.ready = False
@@ -45,6 +46,8 @@ class CalcData():
         self.timestamp = datetime.utcnow().strftime(DATEFORMAT_UTC)
         # all from miscale
         self.data = data
+        self.simpledata = data
+        self.bodyscores = {}
         if self.data and "measured" in self.data and "impedance" in self.data:
             self.weight = self.data["measured"]
             self.impedance = self.data["impedance"]
@@ -68,7 +71,7 @@ class CalcData():
                     return json.dumps(self.data)
                 return json.dumps(self.data, sort_keys=True, indent=4, ensure_ascii=False)
             else:
-                return None    
+                return None
         except BaseException as e:
             log.error(f"Error {__name__}, {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass
@@ -83,7 +86,7 @@ class CalcData():
             "sex": self.sex,
             "male": (self.sex == 'male') * 1,
             "athletic": self.athletic,
-            "targetweight": self.targetweight,
+            "targetweight": self.userscores['WEIGHT'],
             "adjustments": self.adjustments,
             "scaledata": {
                 "weight": self.weight,
@@ -112,8 +115,8 @@ class CalcData():
     def __getAge__(self) -> float:
         try:
             if self.dob:
-                d1 = datetime.strptime(self.dob, "%Y-%m-%d")
-                d2 = datetime.strptime(datetime.today().strftime('%Y-%m-%d'), '%Y-%m-%d')
+                d1 = datetime.strptime(self.dob, DATEFORMAT_YMD)
+                d2 = datetime.strptime(datetime.today().strftime(DATEFORMAT_YMD), DATEFORMAT_YMD)
                 return abs((d2 - d1).days) / 365
             else:
                 return 20.00
@@ -137,10 +140,11 @@ class CalcData():
                 if self.useAgeCalc:
                     self.age = self.__getAge__()
                 self.sex = USER1_SEX
-                self.targetweight = USER1_IDEALWEIGHT
                 self.athletic = USER1_ATHLETIC
                 if USER1_ADJUSTMENTS and USER1_ATHLETIC:
                     self.adjustments = USER1_ADJUSTMENTS
+                if USER1_SCORES:
+                    self.userscores = USER1_SCORES
                 self.userid = "USER1"
 
             elif int(self.weight) < USER2_LT:
@@ -150,10 +154,11 @@ class CalcData():
                 if self.useAgeCalc:
                     self.age = self.__getAge__()
                 self.sex = USER2_SEX
-                self.targetweight = USER2_IDEALWEIGHT
                 self.athletic = USER2_ATHLETIC
                 if USER2_ADJUSTMENTS and USER2_ATHLETIC:
                     self.adjustments = USER2_ADJUSTMENTS
+                if USER2_SCORES:
+                    self.userscores = USER2_SCORES
                 self.userid = "USER2"
 
             else:
@@ -164,10 +169,13 @@ class CalcData():
                     self.age = self.__getAge__()
                 self.sex = USER3_SEX
                 self.athletic = USER3_ATHLETIC
-                self.targetweight = USER3_IDEALWEIGHT
                 if USER3_ADJUSTMENTS and USER3_ATHLETIC:
                     self.adjustments = USER3_ADJUSTMENTS
+                if USER3_SCORES:
+                    self.userscores = USER3_SCORES
                 self.userid = "USER3"
+
+            log.debug("User data loaded  for {}".format(self.user))
 
     def __calcdatadiff__(self) -> dict:
         if self.data:
@@ -204,7 +212,7 @@ class CalcData():
                 log.debug("Data to file {}".format(file_path))
 
             # write the historydata
-            file_path = "{}{}-{}.csv".format(DATA_DIR, str(datetime.today().strftime('%Y-%m')), self.user)
+            file_path = "{}{}-{}.csv".format(DATA_DIR, str(datetime.today().strftime(DATEFORMAT_YM)), self.user)
             log.debug("Save Data to file {}".format(file_path))
             if os.path.isfile(file_path):
                 addHeader = False
@@ -212,7 +220,7 @@ class CalcData():
                 addHeader = True
 
             try:
-                with open(file_path, 'w') as f:
+                with open(file_path, 'a') as f:
                     if addHeader:
                         datastring = ",".join(map(str, list(self.data.keys())))
                         f.write(datastring + '\n')
@@ -225,18 +233,21 @@ class CalcData():
 
     def __setSimpledata__(self):
         try:
-            self.data['user'] = self.user
-            self.data['sex'] = self.sex
-            self.data['athletic'] = self.athletic
-            self.data['age'] = round(self.age, 2)
-            self.data['weight'] = round(self.weight, 2)
-            self.data['unit'] = self.unit
-            self.data['impedance'] = self.impedance
-            self.data['bmi'] = round((self.weight / (self.height ** 2)) * 10000, 2)
-            self.data['water'] = round(0.72 * (-1.976 + 0.907 * self.weight), 2)
-            self.data['fat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
-            self.data['leanfat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
-            self.data['timestamp'] = self.timestamp
+            self.simpledata['user'] = self.user
+            self.simpledata['sex'] = self.sex
+            self.simpledata['athletic'] = self.athletic
+            self.simpledata['age'] = round(self.age, 2)
+            self.simpledata['weight'] = round(self.weight, 2)
+            self.simpledata['unit'] = self.unit
+            self.simpledata['impedance'] = self.impedance
+            self.simpledata['bmi'] = round((self.weight / (self.height ** 2)) * 10000, 2)
+            self.simpledata['water'] = round(0.72 * (-1.976 + 0.907 * self.weight), 2)
+            self.simpledata['fat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
+            self.simpledata['leanfat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
+            self.simpledata['timestamp'] = self.timestamp
+            self.simpledata['version'] = self.version
+            self.simpledata["icon"] = "mdi:scale-bathroom"
+            self.simpledata['attribution'] = ATTRIBUTION
         except Exception as e:
             log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
             pass
@@ -244,8 +255,15 @@ class CalcData():
     def __setBodyMetricsdata__(self) -> dict():
 
         try:
+
+            if self.data and 'bmr' in self.data:
+                # allready calculated
+                return True
+
+            log.debug("Set Body Metrics data for {}".format(self.user))
             # Körperfettanteil + Knochenmasse + Muskelmasse = 100 % der Körperzusammensetzung
             lib = body_metrics.bodyMetrics(self.weight, self.height, self.age, self.impedance, self.sex)
+
             # user data
             self.data['user'] = self.user
             self.data['sex'] = self.sex
@@ -254,18 +272,23 @@ class CalcData():
             self.data['metabolic_age'] = round(lib.getMetabolicAge(), 2)
             self.data['impedance'] = self.impedance
             self.data['bmi'] = round(lib.getBMI(), 2)
-            self.data['bodytype'] = lib.getBodyTypeScale()[lib.getBodyType()]
+            self.data['bodytype'] = BODY_SCALE_TPYES[lib.getBodyType()]
 
             # weight
             self.data['weight'] = round(self.weight, 2)
             self.data['idealweight'] = round(lib.getIdealWeight(), 2)
+            self.data['targetweight'] = self.userscores['WEIGHT']
             self.data['unit'] = self.unit
 
             self.data['lbm'] = round(lib.getLBMCoefficient(), 2)
             # fat
             self.data['fat'] = round(lib.getFatPercentage(), 2)
             self.data['fattype'] = lib.getFatMassToIdeal()['type']
-            self.data['idealfat'] = round(lib.getFatMassToIdeal()['mass'], 2)
+            # not a valid data from getFatMassToIdeal, use usersettings instead
+            if self.userscores and self.userscores['FAT']:
+                self.data['idealfat'] = self.userscores['FAT']
+            else:
+                self.data['idealfat'] = round(lib.getFatMassToIdeal()['mass'], 2)
             self.data['visceral'] = round(lib.getVisceralFat(), 2)
 
             # water, bone, muscle, protein
@@ -275,14 +298,57 @@ class CalcData():
             self.data['protein'] = round(lib.getProteinPercentage(), 2)
 
             self.data['bmr'] = round(lib.getBMR(), 2)
-
             self.data['timestamp'] = self.timestamp
+            self.data['version'] = self.version
 
             self.__recalibrate__()
+            if self.userscores:
+                self.setBodyScores()
+
+            return True
 
         except Exception as e:
             log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
-            return None
+            return False
+
+    def setBodyScores(self):
+        try:
+            score = body_score.bodyScore(self.age,
+                                         self.sex,
+                                         self.height,
+                                         self.weight,
+                                         self.data['bmi'],
+                                         float(self.userscores['FAT']),
+                                         float(self.userscores['MUSCLE']),
+                                         float(self.userscores['WATER']),
+                                         float(self.userscores['VISCERAL']),
+                                         float(self.userscores['BONES']),
+                                         int(self.userscores['BMR']),
+                                         float(self.userscores['PROTEIN']))
+            self.bodyscores = {}
+            self.bodyscores['user'] = self.user
+            self.bodyscores['score'] = score.getBodyScore()
+            self.bodyscores['bmi'] = score.getBmiDeductScore()
+            self.bodyscores['fat'] = score.getBodyFatDeductScore()
+            self.bodyscores['visceral'] = score.getVisceralFatDeductScore()
+            self.bodyscores['muscle'] = score.getMuscleDeductScore()
+            self.bodyscores['water'] = score.getWaterDeductScore()
+            self.bodyscores['bones'] = score.getBoneDeductScore()
+            self.bodyscores['bmr'] = score.getBasalMetabolismDeductScore()
+            self.bodyscores['protein'] = score.getProteinDeductScore()
+            self.bodyscores['version'] = self.version
+            self.bodyscores['timestamp'] = self.timestamp
+            log.debug("Bodyscores for {}: {}".format(self.user, self.bodyscores))
+
+            # publish the data
+            topic = "{}/{}/scores".format(MQTT_PREFIX, self.user)
+            self.bodyscores["icon"] = "mdi:scale-bathroom"
+            self.bodyscores['attribution'] = ATTRIBUTION
+            self.__publishdata__(topic, self.bodyscores)
+
+        except Exception as e:
+            log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
+            pass
 
     def publish2Influxdb(self):
         if self.data:
@@ -294,21 +360,41 @@ class CalcData():
                 log.error(f"Error {__name__}, Tag: {'MISCALEDATA_' + self.user} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
                 pass
 
+    def publishSimpeData(self):
+        self.__setSimpledata__()
+        if self.simpledata:
+            topic = "{}/{}/measured".format(MQTT_PREFIX, self.user)
+            self.__publishdata__(topic, self.simpledata)
+
+
     def publishdata(self):
+        # publish the body metrics data for the current user
+        self.__setBodyMetricsdata__()
+        self.data["icon"] = "mdi:scale-bathroom"
+        self.data['attribution'] = ATTRIBUTION
+        topic = "{}/{}/data".format(MQTT_PREFIX, self.user)
+        self.__publishdata__(topic, self.data)
 
+        # publish the body metrics changes for the current user
+        diffdata = self.__calcdatadiff__()
+        if diffdata:
+            topic = "{}/{}/prevdata".format(MQTT_PREFIX, self.user)
+            self.__publishdata__(topic, diffdata)
+
+        # save the data ti the history files
+        if DATA_DIR:
+            log.debug("Save {} data to file".format(self.user))
+            self.__savedata__()
+
+        self.publishSimpeData()
+
+    def __publishdata__(self, topic: str = MQTT_PREFIX, data: dict = None):
         try:
-            self.__setBodyMetricsdata__()
-
-            if self.data:
-                self.data['targetweight'] = self.targetweight
-                self.data["icon"] = "mdi:scale-bathroom"
-                self.data['attribution'] = ATTRIBUTION
-
-                log.debug("MQTT publish {}/{}/data payload: {}".format(MQTT_PREFIX, self.user, json.dumps(self.data)))
-
+            if data:
+                log.debug("MQTT publish {}/{}/data payload: {}".format(MQTT_PREFIX, self.user, json.dumps(data)))
                 publish.single(
-                    "{}/{}/data".format(MQTT_PREFIX, self.user),
-                    payload=json.dumps(self.data),
+                    topic,
+                    payload=json.dumps(data),
                     qos=0,
                     retain=False,
                     hostname=MQTT_HOST,
@@ -317,30 +403,8 @@ class CalcData():
                     keepalive=MQTT_KEEPALIVE,
                     auth={'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
                 )
-
-                diffdata = self.__calcdatadiff__()
-                if diffdata:
-                    log.debug("MQTT publish {}/{}/prevdata payload: {}".format(MQTT_PREFIX, self.user, json.dumps(diffdata)))
-                    log.debug("MQTT publish data compare!")
-                    publish.single(
-                        "{}/{}/prevdata".format(MQTT_PREFIX, self.user),
-                        payload=json.dumps(diffdata),
-                        qos=0,
-                        retain=False,
-                        hostname=MQTT_HOST,
-                        port=MQTT_PORT,
-                        client_id=MQTT_CLEINTID,
-                        keepalive=MQTT_KEEPALIVE,
-                        auth={'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
-                    )
-
-                if DATA_DIR:
-                    log.debug("Save {} data to file".format(self.user))
-                    self.__savedata__()
-
             else:
                 log.debug("MQTT publish failed, not data present!")
-
         except BaseException as e:
             log.error(f"Error {__name__}, topic: {MQTT_PREFIX} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass

@@ -11,7 +11,7 @@ DATEFORMAT_YM = '%Y-%m'
 DATEFORMAT_Y = '%Y'
 DATEFORMAT_UTC = '%Y-%m-%dT%H:%M:%SZ'
 DATEFORMAT_TIMESTAMP = '%Y-%m-%d %H:%M:%S.%f'
-LAST_SCANTIMESTAMP = '1900-01-01 00:00:00'
+DATEFORMAT_MISCAN = '%Y-%m-%d %H:%M:%S'
 
 
 """SETTINGS LOGGER
@@ -71,10 +71,18 @@ USER1_GT = 60
 USER1_SEX = "male"
 USER1_NAME = "Peter"
 USER1_HEIGHT = 175
-USER1_IDEALWEIGHT = 68.00
-USER1_IDEALFAT = 11.50
 USER1_ATHLETIC = True
 USER1_DOB = "2000-12-16"
+USER1_SCORES = {
+    "WEIGHT": 70.00,
+    "FAT": 11.50,
+    "VISCERAL": 7.00,
+    "MUSCLE": 56.00,
+    "WATER": 55.00,
+    "BONES": 3.70,
+    "BMR": 2200,
+    "PROTEIN": 22.00
+}
 USER1_ADJUSTMENTS = {
     "78.0": {"fat": 0.766, "visceral": 0.628, "water": 1.186, "bone": 1.271, "muscle": 0.750},
     "77.0": {"fat": 0.756, "visceral": 0.620, "water": 1.187, "bone": 1.276, "muscle": 0.758},
@@ -116,10 +124,18 @@ USER2_LT = 60
 USER2_SEX = "female"
 USER2_NAME = "Reni"
 USER2_HEIGHT = 168
-USER2_IDEALWEIGHT = 54.00
-USER2_IDEALFAT = 18.50
 USER2_ATHLETIC = True
 USER2_DOB = "2004-01-02"
+USER2_SCORES = {
+    "WEIGHT": 54.00,
+    "FAT": 15.50,
+    "VISCERAL": 7.00,
+    "MUSCLE": 48.00,
+    "WATER": 57.00,
+    "BONES": 3.20,
+    "BMR": 1850,
+    "PROTEIN": 18.00
+}
 USER2_ADJUSTMENTS = {
     "77": {"fat": 0.756, "visceral": 0.545, "water": 1.187, "bone": 1.276, "muscle": 0.758},
     "78": {"fat": 0.766, "visceral": 0.552, "water": 1.186, "bone": 1.271, "muscle": 0.750},
@@ -143,11 +159,24 @@ USER2_ADJUSTMENTS = {
 USER3_SEX = "female"
 USER3_NAME = "Tina"
 USER3_HEIGHT = 165
-USER3_IDEALWEIGHT = 68.00
 USER3_ATHLETIC = False
 USER3_DOB = "1980-10-18"
+USER3_SCORES = {
+    "WEIGHT": 68.00,
+    "FAT": 16.50,
+    "VISCERAL": 7.00,
+    "MUSCLE": 42.00,
+    "WATER": 55.00,
+    "BONES": 3.70,
+    "BMR": 1800,
+    "PROTEIN": 18.00
+}
 
 
 """SETTINGS data logger
 """
 DATA_DIR = '../data/'
+
+BODY_SCALE_TPYES = [
+    "Fettleibig", "Übergewichtig", "Dick", "Bewegungsmangel", "Ausgeglichen", "Ausgeglichen Muskulös", "Dünn", "Ausgeglichen-dünn", "Dünn Muskulös",
+]

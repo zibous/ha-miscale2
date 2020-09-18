@@ -77,7 +77,7 @@ def main():
             log.error("BTLE disconnected {}".format(e))
             pass
         except BTLEManagementError as e:
-            sys.stderr.write(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} - Bluetooth connection error: {error}\n")
+            sys.stderr.write(f"{datetime.now().strftime(DATEFORMAT_MISCAN)} - Bluetooth connection error: {error}\n")
             log.error("Bluetooth connection error:{}".format(e))
             if BluetoothFailCounter >= 4:
                 cmd = 'hciconfig ' + HCI_DEV + ' down'

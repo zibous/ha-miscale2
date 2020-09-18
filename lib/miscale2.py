@@ -42,7 +42,7 @@ class Miscale2Decoder():
         self.impedance = 0
         self.unit = None
 
-        self.lastscan = str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+        self.lastscan = str(datetime.today().strftime(DATEFORMAT_MISCAN))
         self.resultData = None
 
         if self.bledevice and self.scanData:
@@ -114,7 +114,7 @@ class Miscale2Decoder():
                 + str(int((self.data[18:20]), 16))
                 + ":"
                 + str(int((self.data[20:22]), 16)),
-                "%Y-%m-%d %H:%M:%S",
+                DATEFORMAT_MISCAN,
             )
 
     def __setResults__(self):
@@ -125,7 +125,7 @@ class Miscale2Decoder():
                 "unit": self.unit,
                 "impedance": self.impedance,
                 "timestamp": self.timestamp,
-                "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+                "scantime": str(datetime.today().strftime(DATEFORMAT_MISCAN))
             }
             return True
 

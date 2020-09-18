@@ -231,17 +231,3 @@ class bodyMetrics:
         else:
             metabolicAge = (self.height * -0.7471) + (self.weight * 0.9161) + (self.age * 0.4184) + (self.impedance * 0.0517) + 54.2267
         return self.checkValueOverflow(metabolicAge, 15, 80)
-
-    # Return body type scale
-    def getBodyTypeScale(self):
-        return [
-            "obese",
-            "overweight",
-            "thick-set",
-            "lack-exerscise",
-            "balanced",
-            "balanced-muscular",
-            "skinny",
-            "balanced-skinny",
-            "skinny-muscular",
-        ]
