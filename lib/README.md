@@ -107,8 +107,10 @@ Informations
   Is used to evaluate the data of the balance and to transfer it to the calculation modules.
 <br>
 - calcdata.py
-  Calculation module for the measurement results. Used once in the application and also in the MQTT service.<br>
+  Calculation module for the measurement results. Used once in the application and also in the MQTT service.
+  <br><br>
   Example:
+ 
   ```python
     data = {
         "measured": 70.65,
