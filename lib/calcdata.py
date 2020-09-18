@@ -396,7 +396,7 @@ class CalcData():
     def __publishdata__(self, topic: str = MQTT_PREFIX, data: dict = None):
         try:
             if data:
-                log.debug("MQTT publish {}/{}/data payload: {}".format(MQTT_PREFIX, self.user, json.dumps(data)))
+                log.debug("MQTT publish {} payload: {}".format(topic, self.user, json.dumps(data)))
                 publish.single(
                     topic,
                     payload=json.dumps(data),
@@ -411,5 +411,5 @@ class CalcData():
             else:
                 log.debug("MQTT publish failed, not data present!")
         except BaseException as e:
-            log.error(f"Error {__name__}, topic: {MQTT_PREFIX} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+            log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass
