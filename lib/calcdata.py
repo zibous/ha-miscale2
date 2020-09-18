@@ -49,8 +49,8 @@ class CalcData():
         self.simpledata = data
         self.bodyscores = {}
         if self.data and "measured" in self.data and "impedance" in self.data:
-            self.weight = self.data["measured"]
-            self.impedance = self.data["impedance"]
+            self.weight = float(self.data["measured"])
+            self.impedance = int(self.data["impedance"])
             if self.data["unit"] and "unit" in self.data:
                 self.unit = self.data["unit"]
             if self.data["timestamp"] and "timstamp" in self.data:

@@ -8,7 +8,6 @@ try:
     from datetime import datetime
     import time
     
-    from constants import AD_TYPES, UNITS
     from conf import *
     from lib import logger
     
@@ -120,10 +119,10 @@ class Miscale2Decoder():
     def __setResults__(self):
         if self.measured and self.impedance:
             self.resultData = {
-                "measured": self.measured,
-                "calcweight": self.calcweight,
+                "measured": float(self.measured),
+                "calcweight": float(self.calcweight),
                 "unit": self.unit,
-                "impedance": self.impedance,
+                "impedance": int(self.impedance),
                 "timestamp": self.timestamp,
                 "scantime": str(datetime.today().strftime(DATEFORMAT_MISCAN))
             }

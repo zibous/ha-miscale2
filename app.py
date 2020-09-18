@@ -46,14 +46,19 @@ class ScanProcessor():
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
 
-        log.debug("Device {}, New:{}, Newdata:{}".format(dev.addr, isNewDev, isNewData))
         # -------------------------------------------
         # decode data form the mi scale 2 device
         # ------------------------------------------
         if dev.addr == MI2_MAC.lower() and isNewDev:
+            
+            log.debug("Device {}, New:{}, Newdata:{}".format(dev.addr, isNewDev, isNewData))
+
             mi2_decoder = Miscale2Decoder(dev)
+            
             mi_data = mi2_decoder.getData()
+
             if mi_data:
+                log.debug("New data present, make calulations and publish...")
                 mCalc = CalcData(mi_data)
                 # publish to mqtt
                 if MQTT_HOST:
