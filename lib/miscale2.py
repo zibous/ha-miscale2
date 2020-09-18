@@ -218,9 +218,10 @@ class Miscale2Decoder():
                     else:
                         log.debug("✘ Device {} {} is sleeping !".format(self.bledevice.addr, self.bledevice.addrType))
 
-                elif sdid == MI2_DATAFLAG or sdid == MI2_NOSERVICE or sdid == 9:
+                elif sdid == MI2_DATAFLAG or sdid == MI2_NOSERVICE or sdid == MI2_LOCALNAME:
                     # (1, 'Flags', '06'),
                     # (2, 'Incomplete 16b Services', '0000181b-0000-1000-8000-00805f9b34fb'),
+                    # (9, 'Complete Local Name', 'MIBFS'),
                     log.debug(("✘ SSID:{}, Data:{}").format(sdid, data))
                     continue
                 elif sdid == MI2_MANUFACTORID:

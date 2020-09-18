@@ -59,6 +59,7 @@ MI2_MAC = "5c:ca:d3:4c:ee:74"
 MI2_SCALE2ID = '1b18'
 MI2_DATAFLAG = 1
 MI2_NOSERVICE = 2
+MI2_LOCALNAME = 9
 MI2_MANUFACTORID = 255
 
 HCI_DEV = 'hci0'  # sudo hciconfig
