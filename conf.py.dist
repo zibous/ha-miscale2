@@ -109,7 +109,7 @@ USER1_ADJUSTMENTS = {
     "63.0": {"fat": 0.483, "visceral": 0.396, "water": 1.033, "bone": 1.316, "muscle": 0.954},
     "62.5": {"fat": 0.560, "visceral": 0.459, "water": 1.014, "bone": 1.326, "muscle": 0.948},
     "61.5": {"fat": 0.462, "visceral": 0.378, "water": 1.030, "bone": 1.288, "muscle": 0.970},
-    "61.00": {"fat": 0.462, "visceral": 0.378, "water": 1.030, "bone": 1.288, "muscle": 0.970}
+    "61.0": {"fat": 0.462, "visceral": 0.378, "water": 1.030, "bone": 1.288, "muscle": 0.970}
 }
 
 USER2_LT = 60

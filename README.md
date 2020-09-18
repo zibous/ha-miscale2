@@ -1,4 +1,4 @@
-# Connector for Xiaomi Mi Scale
+# Connector for Xiaomi Mi Scale - Develop Version
 
 ## Body Composition Scale 2 (XMTZC05HM) Data to MQTT / Influxdb
 Code to read weight measurements from Xiaomi Body Scales.
@@ -92,8 +92,45 @@ Systemd service for  - on systemd powered systems the **recommended** option
    $ sudo systemctl enable ha-miscale-mqtt.service
    ```
 
+## MQTT Data for Homeassistant / Applications
 
+The calculation results are saved once as a history in the data folder, published as an MQTT payload and optionally saved in the defined InfluxDB.
 
+**Sample MQTT Payload**
+
+```json
+{
+   "measured":70.65,
+   "calcweight":70.65,
+   "unit":"kg",
+   "impedance":485,
+   "timestamp":"2020-09-18T06:34:29Z",
+   "scantime":"2020-09-18 08:34:29",
+   "user":"Peter",
+   "sex":"male",
+   "athletic":true,
+   "age":64.8,
+   "metabolic_age":40.39,
+   "bmi":23.07,
+   "bodytype":"balanced",
+   "weight":70.65,
+   "idealweight":66.5,
+   "lbm":55.76,
+   "fat":13.14,
+   "fattype":"to_gain",
+   "idealfat":1.98,
+   "visceral":7.39,
+   "water":55.72,
+   "bone":3.64,
+   "muscle":52.17,
+   "protein":20.47,
+   "bmr":1222.9,
+   "targetweight":68.0,
+   "icon":"mdi:scale-bathroom",
+   "attribution":"Data provided by Peter Siebler"
+}
+```
+<br>
 <hr>
 
 # Acknowledgements:
@@ -120,6 +157,7 @@ Systemd service for  - on systemd powered systems the **recommended** option
 - https://dev.to/henrylim96/reading-xiaomi-mi-scale-data-with-web-bluetooth-scanning-api-1mb9<br>
 - https://github.com/Wingjam/ReverseMiScale/blob/master/miScale.py<br>
 - https://tanita.de/hilfe-und-anleitungen/richtige-interpretation-ihrer-messwerte/<br>
+- https://github.com/oliexdev/openScale<br>
 
 # Omron, Medisana, Xiaomi
 - https://www.amazon.de/Omron-HBF-511B-E-Ganzkörperanalyse-Waage-BF511-blau/dp/B0033AGBW0<br>
