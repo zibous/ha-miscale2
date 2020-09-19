@@ -46,7 +46,7 @@ class CalcData():
         self.timestamp = datetime.utcnow().strftime(DATEFORMAT_UTC)
         # all from miscale
         self.data = data
-        self.simpledata = data
+        self.simpledata = {}
         self.bodyscores = {}
         if self.data and "measured" in self.data and "impedance" in self.data:
             self.weight = float(self.data["measured"])
@@ -77,43 +77,51 @@ class CalcData():
             pass
 
     def getUserData(self) -> dict:
-        return {
-            "userid": self.userid,
-            "name": self.user,
-            "dob": self.dob,
-            "height": self.height,
-            "age": self.age,
-            "sex": self.sex,
-            "male": (self.sex == 'male') * 1,
-            "athletic": self.athletic,
-            "targetweight": self.userscores['WEIGHT'],
-            "adjustments": self.adjustments,
-            "scaledata": {
-                "weight": self.weight,
-                "unit": self.unit,
-                "impedance": self.impedance,
-                "timestamp": self.timestamp,
-            },
-            "ready": self.ready,
-            "appversion": self.version
-        }
+        try:
+            return {
+                "userid": self.userid,
+                "name": self.user,
+                "dob": self.dob,
+                "height": self.height,
+                "age": self.age,
+                "sex": self.sex,
+                "male": (self.sex == 'male') * 1,
+                "athletic": self.athletic,
+                "targetweight": self.userscores['WEIGHT'],
+                "adjustments": self.adjustments,
+                "scaledata": {
+                    "weight": self.weight,
+                    "unit": self.unit,
+                    "impedance": self.impedance,
+                    "timestamp": self.timestamp,
+                },
+                "ready": self.ready,
+                "appversion": self.version
+            }
+        except BaseException as e:
+            log.error(f"Error {__name__}, {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+            return None
 
     def round_to_value(self, number, roundto: float = 0.5) -> str:
         return str(round(float(number) / roundto) * roundto)
 
     def __recalibrate__(self):
-        if self.adjustments and self.athletic:
-            idx = self.round_to_value(self.weight)
-            if idx in self.adjustments:
-                log.debug('Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))    
-                cf = self.adjustments[idx]
-                self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
-                #self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
-                self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
-                self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
-                # self.data['muscle'] = round(float(self.data['muscle'])*float(cf['muscle']),2)
-            else:
-                log.debug('No calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))    
+        try:
+            if self.adjustments and self.athletic:
+                idx = self.round_to_value(self.weight)
+                if idx in self.adjustments:
+                    log.debug('Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
+                    cf = self.adjustments[idx]
+                    self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
+                    #self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
+                    self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
+                    self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
+                    # self.data['muscle'] = round(float(self.data['muscle'])*float(cf['muscle']),2)
+                else:
+                    log.debug('No calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
+        except BaseException as e:
+            log.error(f"Error {__name__}, {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+            pass
 
     def __getAge__(self) -> float:
         try:
@@ -128,6 +136,7 @@ class CalcData():
             pass
 
     def __getDOB__(self):
+        # simulate the DOB for 18 Years old
         current_date = date.today().isoformat()
         return (date.today() - timedelta(days=365 * 18)).isoformat()
 
@@ -221,7 +230,6 @@ class CalcData():
                 addHeader = False
             else:
                 addHeader = True
-
             try:
                 with open(file_path, 'a') as f:
                     if addHeader:
@@ -243,10 +251,11 @@ class CalcData():
             self.simpledata['weight'] = round(self.weight, 2)
             self.simpledata['unit'] = self.unit
             self.simpledata['impedance'] = self.impedance
+            # simple caclulation for the water, fat.....
             self.simpledata['bmi'] = round((self.weight / (self.height ** 2)) * 10000, 2)
             self.simpledata['water'] = round(0.72 * (-1.976 + 0.907 * self.weight), 2)
             self.simpledata['fat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
-            self.simpledata['leanfat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
+            # self.simpledata['leanfat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
             self.simpledata['timestamp'] = self.timestamp
             self.simpledata['version'] = self.version
             self.simpledata["icon"] = "mdi:scale-bathroom"
@@ -258,12 +267,11 @@ class CalcData():
     def __setBodyMetricsdata__(self) -> dict():
 
         try:
-
             if self.data and 'bmr' in self.data:
                 # allready calculated
                 return True
 
-            log.debug("Set Body Metrics data for {}, Weight:{}".format(self.user,self.weight))
+            log.debug("Set Body Metrics data for {}, Weight:{}".format(self.user, self.weight))
             # Körperfettanteil + Knochenmasse + Muskelmasse = 100 % der Körperzusammensetzung
             lib = body_metrics.bodyMetrics(self.weight, self.height, self.age, self.impedance, self.sex)
 
@@ -307,6 +315,7 @@ class CalcData():
             self.data['version'] = self.version
 
             self.__recalibrate__()
+
             if self.userscores:
                 self.setBodyScores()
 
@@ -318,38 +327,45 @@ class CalcData():
 
     def setBodyScores(self):
         try:
-            score = body_score.bodyScore(self.age,
-                                         self.sex,
-                                         self.height,
-                                         self.weight,
-                                         self.data['bmi'],
-                                         float(self.userscores['FAT']),
-                                         float(self.userscores['MUSCLE']),
-                                         float(self.userscores['WATER']),
-                                         float(self.userscores['VISCERAL']),
-                                         float(self.userscores['BONES']),
-                                         int(self.userscores['BMR']),
-                                         float(self.userscores['PROTEIN']))
-            self.bodyscores = {}
-            self.bodyscores['user'] = self.user
-            self.bodyscores['score'] = score.getBodyScore()
-            self.bodyscores['bmi'] = score.getBmiDeductScore()
-            self.bodyscores['fat'] = score.getBodyFatDeductScore()
-            self.bodyscores['visceral'] = score.getVisceralFatDeductScore()
-            self.bodyscores['muscle'] = score.getMuscleDeductScore()
-            self.bodyscores['water'] = score.getWaterDeductScore()
-            self.bodyscores['bones'] = score.getBoneDeductScore()
-            self.bodyscores['bmr'] = score.getBasalMetabolismDeductScore()
-            self.bodyscores['protein'] = score.getProteinDeductScore()
-            self.bodyscores['version'] = self.version
-            self.bodyscores['timestamp'] = self.timestamp
-            log.debug("Bodyscores for {}: {}".format(self.user, self.bodyscores))
+            if self.userscores:
+                score = body_score.bodyScore(self.age,
+                                             self.sex,
+                                             self.height,
+                                             self.weight,
+                                             self.data['bmi'],
+                                             float(self.userscores['FAT']),
+                                             float(self.userscores['MUSCLE']),
+                                             float(self.userscores['WATER']),
+                                             float(self.userscores['VISCERAL']),
+                                             float(self.userscores['BONES']),
+                                             int(self.userscores['BMR']),
+                                             float(self.userscores['PROTEIN']))
 
-            # publish the data
-            topic = "{}/{}/scores".format(MQTT_PREFIX, self.user)
-            self.bodyscores["icon"] = "mdi:scale-bathroom"
-            self.bodyscores['attribution'] = ATTRIBUTION
-            self.__publishdata__(topic, self.bodyscores)
+                self.bodyscores = {}
+                self.bodyscores['user'] = self.user
+                self.bodyscores['score'] = score.getBodyScore()
+                result = self.__calcdatadiff__()
+                if result:
+                    self.bodyscores['deltas'] = {}
+                    self.bodyscores['deltas']['weight'] = result['weight']
+                    self.bodyscores['deltas']['fat'] = result['fat']
+                    self.bodyscores['deltas']['water'] = result['water']
+                    self.bodyscores['deltas']['muscle'] = result['muscle']
+                    self.bodyscores['deltas']['visceral'] = result['visceral']
+                    self.bodyscores['deltas']['protein'] = result['protein']
+                self.bodyscores['scores'] = {}
+                self.bodyscores['scores']['bmi'] = score.getBmiDeductScore()
+                self.bodyscores['scores']['fat'] = score.getBodyFatDeductScore()
+                self.bodyscores['scores']['visceral'] = score.getVisceralFatDeductScore()
+                self.bodyscores['scores']['muscle'] = score.getMuscleDeductScore()
+                self.bodyscores['scores']['water'] = score.getWaterDeductScore()
+                self.bodyscores['scores']['bones'] = score.getBoneDeductScore()
+                self.bodyscores['scores']['bmr'] = score.getBasalMetabolismDeductScore()
+                self.bodyscores['scores']['protein'] = score.getProteinDeductScore()
+                self.bodyscores['version'] = self.version
+                self.bodyscores['timestamp'] = self.timestamp
+
+                log.debug("Bodyscores found for {}: {}".format(self.user, self.bodyscores))
 
         except Exception as e:
             log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
@@ -365,52 +381,71 @@ class CalcData():
                 log.error(f"Error {__name__}, Tag: {'MISCALEDATA_' + self.user} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
                 pass
 
-    def publishSimpeData(self):
-        self.__setSimpledata__()
-        if self.simpledata:
-            topic = "{}/{}/measured".format(MQTT_PREFIX, self.user)
-            self.__publishdata__(topic, self.simpledata)
+    def publishdata(self, datasections: dict = None):
+        try:
+            if not datasections:
+                # default
+                datasections = {
+                    "fulldata": True,
+                    "scores": True,
+                    "simpledata": True,
+                    "influxdb": True
+                }
 
+            self.__setBodyMetricsdata__()
 
-    def publishdata(self):
-        # publish the body metrics data for the current user
-        self.__setBodyMetricsdata__()
+            if "fulldata" in datasections:
+                # publish 'tele/user/data' the body metrics data for the current user
+                self.data["icon"] = "mdi:scale-bathroom"
+                self.data['attribution'] = ATTRIBUTION
+                topic = "{}/{}/data".format(MQTT_PREFIX, self.user)
+                self.__publishdata__(topic, self.data)
 
-        self.data["icon"] = "mdi:scale-bathroom"
-        self.data['attribution'] = ATTRIBUTION
-        topic = "{}/{}/data".format(MQTT_PREFIX, self.user)
-        self.__publishdata__(topic, self.data)
+            if "scores" in datasections:
+                if self.bodyscores and 'score' in self.bodyscores:
+                    # publish 'tele/user/scores' the body metrics data for the current user
+                    topic = "{}/{}/scores".format(MQTT_PREFIX, self.user)
+                    self.bodyscores["icon"] = "mdi:scale-bathroom"
+                    self.bodyscores['attribution'] = ATTRIBUTION
+                    self.__publishdata__(topic, self.bodyscores)
 
-        # publish the body metrics changes for the current user
-        diffdata = self.__calcdatadiff__()
-        if diffdata:
-            topic = "{}/{}/prevdata".format(MQTT_PREFIX, self.user)
-            self.__publishdata__(topic, diffdata)
+            if DATA_DIR:
+                # save the data ti the history files
+                log.debug("Save {} data to file".format(self.user))
+                self.__savedata__()
 
-        # save the data ti the history files
-        if DATA_DIR:
-            log.debug("Save {} data to file".format(self.user))
-            self.__savedata__()
+            if "simpledata" in datasections:
+                # publish 'tele/user/measured' the body metrics data for the current user
+                self.__setSimpledata__()
+                topic = "{}/{}/measured".format(MQTT_PREFIX, self.user)
+                self.__publishdata__(topic, self.simpledata)
 
-        self.publishSimpeData()
+            if "influxdb" in datasections and INFLUXDB_HOST:
+                # publish data to influxdb
+                self.publish2Influxdb()
+
+        except BaseException as e:
+            log.error(f"Error {__name__}, Data for: {self.user}, Error: {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+            pass
 
     def __publishdata__(self, topic: str = MQTT_PREFIX, data: dict = None):
-        try:
-            if data:
-                log.debug("MQTT publish {},  payload:{}.".format(topic, json.dumps(data)))
-                publish.single(
-                    topic,
-                    payload=json.dumps(data),
-                    qos=0,
-                    retain=False,
-                    hostname=MQTT_HOST,
-                    port=MQTT_PORT,
-                    client_id=MQTT_CLEINTID,
-                    keepalive=MQTT_KEEPALIVE,
-                    auth={'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
-                )
-            else:
-                log.debug("MQTT publish failed, not data present!")
-        except BaseException as e:
-            log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
-            pass
+        if MQTT_HOST and MQTT_PREFIX and data:
+            try:
+                if data:
+                    log.debug("MQTT publish {},  payload:{}.".format(topic, json.dumps(data)))
+                    publish.single(
+                        topic,
+                        payload=json.dumps(data),
+                        qos=0,
+                        retain=False,
+                        hostname=MQTT_HOST,
+                        port=MQTT_PORT,
+                        client_id=MQTT_CLEINTID,
+                        keepalive=MQTT_KEEPALIVE,
+                        auth={'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
+                    )
+                else:
+                    log.debug("MQTT publish failed, not data present!")
+            except BaseException as e:
+                log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+                pass

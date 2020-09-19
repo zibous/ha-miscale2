@@ -60,13 +60,8 @@ class ScanProcessor():
             if mi_data:
                 log.debug("New data present, make calulations and publish...")
                 mCalc = CalcData(mi_data)
-                # publish to mqtt
-                if MQTT_HOST:
+                if mCalc.ready:
                     mCalc.publishdata()
-                # influxdb
-                if INFLUXDB_HOST:
-                    mCalc.publish2Influxdb()
-
 
 def main():
 

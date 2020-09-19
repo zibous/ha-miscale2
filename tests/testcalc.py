@@ -63,12 +63,8 @@ def testcase1():
     mCalc = calcdata.CalcData(data,True)
     mi_data = mCalc.getData('data')
     if mCalc.ready:
-        # publish to mqtt
-        if MQTT_HOST:
-            mCalc.publishdata()
-        # influxdb
-        if INFLUXDB_HOST:
-            mCalc.publish2Influxdb()
+        mCalc.publishdata()
+        
     else:
         log.error("No data present !")
 
