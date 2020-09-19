@@ -25,6 +25,21 @@ PAL = 2.5
 IMPEDANCE = 435
 
 
+# Male:
+    # Robinson formula: 52 kg + 1.9 kg per every inch over 5 feet
+    # Miller formula: 56.2 kg + 1.41 kg per every inch over 5 feet
+    # Hamwi formula: 48.0 kg + 2.7 kg per every inch over 5 feet
+    # Devine formula: 50.0 kg + 2.3 kg per every inch over 5 feet
+
+# Female:
+
+    # Robinson formula: 49 kg + 1.7 kg per every inch over 5 feet
+    # Miller formula: 53.1 kg + 1.36 kg per every inch over 5 feet
+    # Hamwi formula: 45.5 kg + 2.2 kg per every inch over 5 feet
+    # Devine formula: 45.5 kg + 2.3 kg per every inch over 5 feet
+
+# 5ft × 30.48
+
 # -------------------------------
 # J. D. Robinson Formula (1983):
 # -------------------------------
@@ -32,9 +47,9 @@ IMPEDANCE = 435
 # For Women: IBW = 49 + (1.7 x (Ht – 60))
 def IBW_robinson(height: int = HEIGHT, sex: str = SEX) -> float:
     if sex == "female":
-        IBW = 49 + (1.7 * (height - 60))
+        IBW = 49 + (1.7 * (height - (5*34)))
     else:
-        IBW = 52 + (1.9 * (height - 60))
+        IBW = 52 + (1.9 * (height - (5*34)))
     return IBW
 
 
@@ -43,7 +58,10 @@ def IBW_robinson(height: int = HEIGHT, sex: str = SEX) -> float:
 # -----------------------------
 def IBW_miller(height: int = HEIGHT, sex: str = SEX) -> float:
     if sex == "female":
-        IBW = 53.1 + (1.36 * (height - 60))
+        IBW = 53.1 + (1.36 * (height - (5*34)))
     else:
-        IBW = 56.2 + (1.41 * (height - 60))
+        IBW = 56.2 + (1.41 * (height - (5*34)))
     return IBW
+
+print('IBW_robinson', IBW_robinson())
+print('IBW_miller', IBW_miller())

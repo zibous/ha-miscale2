@@ -19,10 +19,6 @@ def getVisceralFat(weight: float = 70.5, height: int = 178, age: float = 18.0, s
         else:
             subcalc = 0.765 + height * -0.0015
             vfal = (((height * 0.143) - (weight * subcalc)) * -1) + (age * 0.15) - 5.60
-
-            subcalc = 0.765 + height * -0.0015
-            vfal = (((height * 0.143) - (weight * subcalc)) * -1) + (age * 0.15) - 5.60
-
     return vfal
 
 print(getVisceralFat())

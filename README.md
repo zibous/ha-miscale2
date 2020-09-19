@@ -158,6 +158,7 @@ The calculation results are saved once as a history in the data folder, publishe
 - https://github.com/Wingjam/ReverseMiScale/blob/master/miScale.py<br>
 - https://tanita.de/hilfe-und-anleitungen/richtige-interpretation-ihrer-messwerte/<br>
 - https://github.com/oliexdev/openScale<br>
+- https://support.withings.com/hc/en-us/articles/218500778-Body-What-are-the-normal-ranges-for-body-composition-<br>
 
 # Omron, Medisana, Xiaomi
 - https://www.amazon.de/Omron-HBF-511B-E-Ganzkörperanalyse-Waage-BF511-blau/dp/B0033AGBW0<br>

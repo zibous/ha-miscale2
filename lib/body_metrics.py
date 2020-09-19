@@ -73,12 +73,14 @@ class bodyMetrics:
         return self.checkValueOverflow(bmr, 500, 10000)
 
     # Get fat percentage
+    # modified by peter siebler
     def getFatPercentage(self):
         # Set a constant to remove from LBM
         if self.sex == 'female' and self.age <= 49:
             const = 9.25
         elif self.sex == 'female' and self.age > 49:
             const = 7.25
+            const = 4.95  # new
         else:
             const = 0.8
 
@@ -120,6 +122,7 @@ class bodyMetrics:
         return self.checkValueOverflow(waterPercentage * coefficient, 35, 75)
 
     # Get bone mass
+    # modified by Peter Siebler
     def getBoneMass(self):
         if self.sex == 'female':
             base = 0.245691014
@@ -127,6 +130,10 @@ class bodyMetrics:
             base = 0.18016894
 
         boneMass = (base - (self.getLBMCoefficient() * 0.05158)) * -1
+
+        # NEW
+        if self.sex == 'female':
+            boneMass = (base - (self.getLBMCoefficient() * 0.07158)) * -1
 
         if boneMass > 2.2:
             boneMass += 0.1
@@ -160,7 +167,7 @@ class bodyMetrics:
                 subsubcalc = ((self.height * 1.45) + (self.height * 0.1158) * self.height) - 120
                 subcalc = self.weight * 500 / subsubcalc
                 vfal = (subcalc - 6) + (self.age * 0.07)
-            elif self.weight<65:   
+            elif self.weight < 65:
                 # add this to get values
                 subsubcalc = ((self.height * 1.45) + (self.height * 0.1158) * self.height) - self.weight
                 subcalc = self.weight * 460 / subsubcalc

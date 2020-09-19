@@ -1,14 +1,14 @@
 [Unit]
-Description=Bodyscale Service Application
-Documentation=https://github.com/zibous/ha-smartmeter
+Description=Xiaomi Mi Scale Service Application
+Documentation=https://github.com/zibous/ha-miscale2
 After=network.target
 
 [Service]
 Type=notify
 User=daemon
 Group=daemon
-WorkingDirectory=/opt/ha-miscale/
-ExecStart=/usr/bin/python3 /opt/mi-scale/app.py
+WorkingDirectory=/opt/ha-miscale2/
+ExecStart=/usr/bin/python3 /opt/ha-miscale2/app.py
 StandardOutput=null
 #StandardOutput=syslog
 #SyslogIdentifier=miscale

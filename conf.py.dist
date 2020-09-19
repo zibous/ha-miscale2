@@ -77,6 +77,7 @@ USER1_SEX = "male"
 USER1_NAME = "Peter"
 USER1_HEIGHT = 175
 USER1_ATHLETIC = True
+USER1_ACTIVITY = 1.8    # Typical adult PAL values range from 1.20 to 2.40.
 USER1_DOB = "2000-12-16"
 USER1_SCORES = {
     "WEIGHT": 70.00,
@@ -130,6 +131,7 @@ USER2_SEX = "female"
 USER2_NAME = "Reni"
 USER2_HEIGHT = 168
 USER2_ATHLETIC = False
+USER2_ACTIVITY = 1.5    # Typical adult PAL values range from 1.20 to 2.40.
 USER2_DOB = "2004-01-02"
 USER2_SCORES = {
     "WEIGHT": 54.00,
@@ -148,6 +150,7 @@ USER3_SEX = "female"
 USER3_NAME = "Tina"
 USER3_HEIGHT = 165
 USER3_ATHLETIC = False
+USER2_ACTIVITY = 1.10   # Typical adult PAL values range from 1.20 to 2.40.
 USER3_DOB = "1980-10-18"
 USER3_SCORES = {
     "WEIGHT": 68.00,

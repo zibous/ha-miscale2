@@ -302,6 +302,7 @@ class CalcData():
             self.data['protein'] = round(lib.getProteinPercentage(), 2)
 
             self.data['bmr'] = round(lib.getBMR(), 2)
+            # self.data['TDEE'] = self.data['bmr'] *
             self.data['timestamp'] = self.timestamp
             self.data['version'] = self.version
 
@@ -396,7 +397,7 @@ class CalcData():
     def __publishdata__(self, topic: str = MQTT_PREFIX, data: dict = None):
         try:
             if data:
-                log.debug("MQTT publish {} payload: {}".format(topic, self.user, json.dumps(data)))
+                log.debug("MQTT publish {},  payload:{}.".format(topic, json.dumps(data)))
                 publish.single(
                     topic,
                     payload=json.dumps(data),

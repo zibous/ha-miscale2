@@ -75,7 +75,7 @@ def main():
     while True:
         try:
             scanner = btle.Scanner().withDelegate(ScanProcessor())
-            log.info("Scanning for devices...")
+            # log.info("Scanning for devices...")
             devices = scanner.scan(5)  # Adding passive=True to try and fix issues on RPi devices
             time.sleep(TIME_INTERVAL)
         except BTLEDisconnectError as e:
