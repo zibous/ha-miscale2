@@ -139,6 +139,9 @@ The calculation results are saved once as a history in the data folder, publishe
 
 
 # Informations
+- https://inbodyusa.com/general/technology/<br>
+- https://www.medeia.com/dtr_bioscan_bia.htm<br>
+- https://www.jstor.org/stable/41463874<br>
 - https://www.wikihow.fitness/Determine-Lean-Body-Mass<br>
 - https://www.omnicalculator.com/health/body-fat#how-to-calculate-body-fat<br>
 - https://calculator-online.net/ideal-weight-calculator/<br>

@@ -140,6 +140,33 @@ A = age in years,
 S = sex: men = 1 women = 0.
 
 
+## Bioelectrical Impedance Analysis: Is It a Reliable Estimator of Lean Body Mass and Total Body Water? 
+
+Multiple regression analysis was used to develop prediction equations for LBM-r and TBW-r, 
+with males coded as 0 and females coded as 
+
+LBM-r = 17.7868 + 0.000985*S² (cm) + 0.3736*W (kg) - 0.0238*R (ohm) - 4.2921*SEX - 0.153*AGE (yrs) 
+R² = 0.917 SEE = 3.231 Kg 
+   
+TBW-r = 9.9868 + 0.000723*S² (cm) + 0.2822*W (kg) - 0.0153*R (ohm) - 2.3313*SEX - 0.1319*AGE (yrs) 
+R² = 0.871 SEE = 2.919 L
+
+https://www.jstor.org/stable/41463874
+
+RJL:             LBM=wt−(wt*(4.95/(1.1554–0.0841(wt*R)/ht2)−4.5)*100/100)
+Lukaski:         LBM=0.734(ht2/R)+0.116(wt)+0.096(Xc)+0.878(Sex:F,0;M,l) −4.03
+Segal: <20% BF : LBM=0.00066360(ht2)−0.02117(R)+0.62854(wt)−0.12380(age) +9.33285
+       >20% BF : LBM=0.00088850(ht2)−0.02999(R)+0.42688(wt)−0.07002(age) +14.52435  
+VanLoan:         LBM=0.00085(ht2)+0.3767(wt)−0.02375(R)−0.1531(age) +17.7868
+Deurenberg:      LBM=0.698*102102ht2/R+3.5 (Sex:F.0;M.1 )+9.4
+
+Wt: weight in kg
+ht: height in cm 
+R : resistance  in ohms
+XC: reactance in ohms
+BF = body fat.
+
+https://www.researchgate.net/publication/14181755_Assessment_of_total_body_water_and_lean_body_mass_from_anthropometry_Watson_formula_creatinine_kinetics_and_body_electrical_impedance_compared_with_antipyrine_kinetics_in_peritoneal_dialysis_patients/link/02bfe510be9856bb08000000/download
 
 ## Body water calculator
 

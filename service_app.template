@@ -5,13 +5,14 @@ After=network.target
 
 [Service]
 Type=notify
-User=daemon
-Group=daemon
+User=root
+
 WorkingDirectory=/opt/ha-miscale2/
 ExecStart=/usr/bin/python3 /opt/ha-miscale2/app.py
-StandardOutput=null
-#StandardOutput=syslog
-#SyslogIdentifier=miscale
+
+StandardOutput=inherit
+StandardError=inherit
+
 StandardError=journal
 Environment=PYTHONUNBUFFERED=true
 Restart=always

@@ -1,17 +1,18 @@
 [Unit]
-Description=Xiaomi Mi Scale MQTT Service
+Description=Xiaomi Mi Scale Service Application
 Documentation=https://github.com/zibous/ha-miscale2
 After=network.target
 
 [Service]
 Type=notify
-User=daemon
-Group=daemon
+User=root
+
 WorkingDirectory=/opt/ha-miscale2/
 ExecStart=/usr/bin/python3 /opt/ha-miscale2/mqttservice.py
-StandardOutput=null
-#StandardOutput=syslog
-#SyslogIdentifier=miscale
+
+StandardOutput=inherit
+StandardError=inherit
+
 StandardError=journal
 Environment=PYTHONUNBUFFERED=true
 Restart=always
