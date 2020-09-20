@@ -36,7 +36,7 @@ class Log(object):
     """Logging wrapper for better output
     """
 
-    def __init__(self, name: str = 'applogger', level: int = 10, logDir: str = None):
+    def __init__(self, name: str = 'applogger', prefix: str = '', level: int = 10, logDir: str = None):
         """Constructor application logger
 
         Args:
@@ -48,6 +48,7 @@ class Log(object):
         self.logger.setLevel(level)
         self.loglevel = level
         self.logDir = logDir
+        self.prefix = prefix
 
         if(logDir):
             # use log file
@@ -61,24 +62,24 @@ class Log(object):
         sys.excepthook = self.handle_excepthook
 
     def debug(self, msg):
-        self.logger.debug(msg)
+        self.logger.debug("{}: {}".format(self.prefix, msg))
 
     def info(self, msg):
-        self.logger.info(msg)
+        self.logger.info("{}: {}".format(self.prefix, msg))
 
     def warning(self, msg):
-        self.logger.warning(msg)
+        self.logger.warning("{}: {}".format(self.prefix, msg))
 
     def error(self, msg):
-        self.logger.error(msg)
+        self.logger.error("{}: {}".format(self.prefix, msg))
 
     def critical(self, msg):
-        self.logger.critical(msg)
+        self.logger.critical("{}: {}".format(self.prefix, msg))
 
     def print(self, msg: str = ' ', end: str = '\r'):
         if(self.loglevel < 100):
+            msg = ("{}:{}".format(self.prefix, msg))
             print(msg, end)
 
     def handle_excepthook(self, type, message, stack):
-        ## self.logger.error(f'An unhandled exception occured: {message}. Traceback: {traceback.extract_tb(stack,1)}')
-        self.logger.critical(f'An unhandled exception occured: {message}. Traceback: {traceback.format_tb(stack)}')
+        self.logger.critical(f'{self.prefix}:An unhandled exception occured: {message}. Traceback: {traceback.format_tb(stack)}')

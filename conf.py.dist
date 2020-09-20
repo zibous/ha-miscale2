@@ -60,6 +60,9 @@ INFLUXDB_LOG_DIR = None  # './data/influxdb'
 """
 MI2_MAC = "5c:ca:d3:4c:ee:74"
 MI2_SCALE2ID = '1b18'
+M12_TYPE = "XMTZC05HM"
+MI2_NAME = "MI Body Composition Scale 2"
+MI2_SHORTNAME = "MIBCS2"
 MI2_DATAREADY = 22
 MI2_DATAFLAG = 1
 MI2_NOSERVICE = 2

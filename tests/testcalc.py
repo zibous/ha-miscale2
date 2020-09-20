@@ -18,7 +18,8 @@ except Exception as e:
     print('Import error {}, check requirements.txt'.format(e))
     sys.exit(1)
 
-log = logger.Log(__name__, LOG_LEVEL)
+log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
+
 
 def libcheck():
     try:
@@ -56,17 +57,18 @@ def testcase1():
         "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
         "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
     }
-    
+
     data = data_peter
 
     log.info('Calcluation based on data:{}'.format(data))
-    mCalc = calcdata.CalcData(data,True)
+    mCalc = calcdata.CalcData(data, True)
     mi_data = mCalc.getData('data')
     if mCalc.ready:
         mCalc.publishdata()
-        
+
     else:
         log.error("No data present !")
+
 
 def testcase2():
 

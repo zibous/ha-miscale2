@@ -22,7 +22,7 @@ except Exception as e:
     print('Import error {}, check requirements.txt'.format(e))
     sys.exit(1)
 
-log = logger.Log(__name__, LOG_LEVEL)
+log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
 
 
 class CalcData():

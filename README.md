@@ -21,6 +21,8 @@ On a modern Linux system just a few steps are needed to get the daemon working. 
 
 
 ```bash
+$ su -
+$ cd /opt/
 $ git clone https://github.com/zibous/ha-miscale2.git
 $ cd /opt/ha-miscale2
 $ sudo pip3 install -r requirements.txt
@@ -42,9 +44,11 @@ $ chmod +x mqttservice.py
 ## tests
 $ python3 app.py
 $ ./app.py
+$ ./app.py && tail -f /var/log/syslog | grep MIBCS2
 
 $ python3 mqttservice.py
-$ ./mqttservice.py
+$ ./mqttservice.py && tail -f /var/log/syslog | grep MIBCS2
+
 ```
 
 
@@ -140,6 +144,7 @@ The calculation results are saved once as a history in the data folder, publishe
 
 # Informations
 - https://inbodyusa.com/general/technology/<br>
+- https://github.com/limhenry/web-bluetooth-mi-scale<br>
 - https://www.medeia.com/dtr_bioscan_bia.htm<br>
 - https://www.jstor.org/stable/41463874<br>
 - https://www.wikihow.fitness/Determine-Lean-Body-Mass<br>
@@ -162,6 +167,8 @@ The calculation results are saved once as a history in the data folder, publishe
 - https://tanita.de/hilfe-und-anleitungen/richtige-interpretation-ihrer-messwerte/<br>
 - https://github.com/oliexdev/openScale<br>
 - https://support.withings.com/hc/en-us/articles/218500778-Body-What-are-the-normal-ranges-for-body-composition-<br>
+- https://googlechrome.github.io/samples/web-bluetooth/scan.html<br>
+
 
 # Omron, Medisana, Xiaomi
 - https://www.amazon.de/Omron-HBF-511B-E-Ganzkörperanalyse-Waage-BF511-blau/dp/B0033AGBW0<br>
