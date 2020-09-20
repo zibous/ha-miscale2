@@ -7,6 +7,8 @@ sys.path.append("..")
 try:
     from datetime import datetime
     import time
+    import paho.mqtt.publish as publish
+    import json
 
     from conf import *
     from lib import logger
@@ -63,7 +65,7 @@ class Miscale2Decoder():
             self.measured = 0.00
             self.unit = None
 
-            self.measured = int((self.data[28:30] + self.data[26:28]), 16) * 0.01
+            self.measured = float(int((self.data[28:30] + self.data[26:28]), 16) * 0.01)
             log.debug("Measured 1:{}, p1:{}, p2:{}".format(self.measured, self.data[28:30], self.data[26:28]))
 
             # get unit
@@ -86,7 +88,7 @@ class Miscale2Decoder():
 
     def __decodeImpedance__(self):
         # get impedance
-        self.impedance = str(int((self.data[24:26] + self.data[22:24]), 16))
+        self.impedance = int(str(int((self.data[24:26] + self.data[22:24]), 16))
         log.debug("Impedance  = {} Ω,  p1:{}, p2:{}".format(self.impedance, self.data[24:26], self.data[22:24]))
 
     def __decodeTimestamp__(self):
@@ -145,11 +147,12 @@ class Miscale2Decoder():
                 'info': self.scaninfo,
                 'load': self.loadRemoved,
                 'stabilized': self.isStabilized,
-                'measured', self.measured,
-                'impedance': self.impedance
+                'measured': self.measured,
+                'impedance': self.impedance,
                 'unit': self.unit,
+                'lastscan': self.lastscan,
                 'version': self.version,
-                'timestamp': str(datetime.today().strftime(DATEFORMAT_MISCAN))
+                'timestamp': str(datetime.today().strftime(DATEFORMAT_MISCAN)),
                 'attribution': ATTRIBUTION
             }
             topic = "{}/state".format(MQTT_PREFIX)
@@ -166,8 +169,9 @@ class Miscale2Decoder():
                 'rssi': self.bledevice.rssi,
                 'info': self.scaninfo,
                 'status': devicestate,
+                'lastscan': self.lastscan,
                 'version': self.version,
-                'timestamp': str(datetime.today().strftime(DATEFORMAT_MISCAN))
+                'timestamp': str(datetime.today().strftime(DATEFORMAT_MISCAN)),
                 'attribution': ATTRIBUTION
             }
             topic = "{}/status".format(MQTT_PREFIX)
@@ -181,7 +185,7 @@ class Miscale2Decoder():
             if MQTT_HOST and MQTT_PREFIX and topic and data:
                 publish.single(
                     topic,
-                    payload=json.dumps(payload),
+                    payload=json.dumps(data),
                     qos=0,
                     retain=False,
                     hostname=MQTT_HOST,
