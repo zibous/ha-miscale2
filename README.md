@@ -40,6 +40,8 @@ $ nano conf.py
 
 $ chmod +x app.py
 $ chmod +x mqttservice.py
+$ chmod +x service.sh
+$ chmod +x service_mqtt.sh
 
 ## tests
 $ python3 app.py
