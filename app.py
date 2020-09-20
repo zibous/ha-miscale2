@@ -100,9 +100,4 @@ def main():
 if __name__ == "__main__":
     log.info("Start Xiaomi Mi Scale Service Application")
     time.sleep(10)
-    
     main()
-
-    while True:
-      print('Xiaomi Mi Scale Service Application is active...')
-      time.sleep(5)

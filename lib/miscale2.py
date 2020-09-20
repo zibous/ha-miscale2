@@ -9,7 +9,6 @@ try:
     import time
     import paho.mqtt.publish as publish
     import json
-    from pymemcache.client import base
 
     from conf import *
     from lib import logger
@@ -19,20 +18,19 @@ except Exception as e:
 
 
 log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
-client = base.Client(('localhost', 196677))
 
 
 def last_timeStamp(action: str = "set", value: str = None):
+    global LAST_TIMESTAMP
     if action == 'set':
         if value:
-            client.set('lasttimestamp', value)
+            LAST_TIMESTAMP = value
         else:
-            client.set('lasttimestamp', str(datetime.today().strftime(DATEFORMAT_MISCAN)))
+            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_MISCAN))
     if action == 'get':
-        result = client.get('lasttimestamp')
-        if result is None:
-            result = '1900-01-01 00:00:00'
-        return result
+        if LAST_TIMESTAMP is None:
+            LAST_TIMESTAMP  = '1900-01-01 00:00:00'
+        return LAST_TIMESTAMP
 
 
 class Miscale2Decoder():
@@ -132,7 +130,7 @@ class Miscale2Decoder():
 
     def __setResults__(self):
         if self.measured and self.impedance:
-            self.resultData={
+            self.resultData = {
                 "measured": float(self.measured),
                 "calcweight": float(self.calcweight),
                 "unit": self.unit,
@@ -146,17 +144,17 @@ class Miscale2Decoder():
 
     def __checkControlByte__(self):
         # 02a6e4070908152707d4012837
-        data2=bytes.fromhex(self.data[4:])
-        ctrlByte1=data2[1]
-        self.loadRemoved=ctrlByte1 & (1 << 7)
-        self.isStabilized=ctrlByte1 & (1 << 5) != 0
-        self.hasImpedance=ctrlByte1 & (1 << 1) != 0
+        data2 = bytes.fromhex(self.data[4:])
+        ctrlByte1 = data2[1]
+        self.loadRemoved = ctrlByte1 & (1 << 7)
+        self.isStabilized = ctrlByte1 & (1 << 5) != 0
+        self.hasImpedance = ctrlByte1 & (1 << 1) != 0
         log.debug("Control bytes:{} Emptyload:{},Stabilized:{},Has Impedanz:{}".format(ctrlByte1, self.loadRemoved, self.isStabilized, self.hasImpedance))
         return self.loadRemoved and self.hasImpedance
 
     def __publishStateInfo__(self):
         try:
-            self.devicestate={
+            self.devicestate = {
                 'mac': self.bledevice.addr,
                 'type': self.bledevice.addrType,
                 'rssi': self.bledevice.rssi,
@@ -171,15 +169,15 @@ class Miscale2Decoder():
                 'timestamp': str(datetime.today().strftime(DATEFORMAT_MISCAN)),
                 'attribution': ATTRIBUTION
             }
-            topic="{}/state".format(MQTT_PREFIX)
+            topic = "{}/state".format(MQTT_PREFIX)
             self.__publishdata__(topic, self.devicestate)
         except BaseException as e:
             log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass
 
-    def __publishstatus__(self, devicestate: str='scanning'):
+    def __publishstatus__(self, devicestate: str = 'scanning'):
         try:
-            data={
+            data = {
                 'mac': self.bledevice.addr,
                 'type': self.bledevice.addrType,
                 'rssi': self.bledevice.rssi,
@@ -190,13 +188,13 @@ class Miscale2Decoder():
                 'timestamp': str(datetime.today().strftime(DATEFORMAT_MISCAN)),
                 'attribution': ATTRIBUTION
             }
-            topic="{}/status".format(MQTT_PREFIX)
+            topic = "{}/status".format(MQTT_PREFIX)
             self.__publishdata__(topic, data)
         except BaseException as e:
             log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass
 
-    def __publishdata__(self, topic: str=None, data: dict=None):
+    def __publishdata__(self, topic: str = None, data: dict = None):
         try:
             if MQTT_HOST and MQTT_PREFIX and topic and data:
                 publish.single(
@@ -235,7 +233,7 @@ class Miscale2Decoder():
             # desc is a human-readable description of the data type and value is the data itself
             for (sdid, desc, data) in self.scanData:
 
-                self.data=data
+                self.data = data
 
                 # MiScale Raw Data Schema
                 # +------+------------------------+
@@ -264,7 +262,7 @@ class Miscale2Decoder():
 
                     log.debug("SSID:{}, Type:{}".format(sdid, data[1:4]))
 
-                    self.scaninfo="{}-{}-{}".format(sdid, desc, data)
+                    self.scaninfo = "{}-{}-{}".format(sdid, desc, data)
 
                     self.__publishstatus__()
 
@@ -289,13 +287,13 @@ class Miscale2Decoder():
                     if self.impedance:
 
                         # get timestamp from the device
-                        self.timestamp=self.__decodeTimestamp__()
+                        self.timestamp = self.__decodeTimestamp__()
 
                         self.__publishStateInfo__()
 
                         # final check and build result data
                         if self.timestamp and (str(self.timestamp) > self.lastscan):
-                            self.lastscan=str(self.timestamp)
+                            self.lastscan = str(self.timestamp)
                             last_timeStamp('set', str(self.timestamp))
                             self.__setResults__()
 

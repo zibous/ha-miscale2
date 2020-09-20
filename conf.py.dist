@@ -15,7 +15,7 @@ DATEFORMAT_Y = '%Y'
 DATEFORMAT_UTC = '%Y-%m-%dT%H:%M:%SZ'
 DATEFORMAT_TIMESTAMP = '%Y-%m-%d %H:%M:%S.%f'
 DATEFORMAT_MISCAN = '%Y-%m-%d %H:%M:%S'
-
+LAST_TIMESTAMP = None
 
 """SETTINGS LOGGER
 """

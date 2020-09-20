@@ -1,5 +1,4 @@
 uptime==3.0.1
-pymemcache==3.4.0
 numpy==1.19.1
 influxdb==5.3.0
 matplotlib==3.3.0
