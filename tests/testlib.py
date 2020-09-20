@@ -21,17 +21,21 @@ IMPEDANCE = 525
 # Get BMI
 # The BMI is universally expressed in kg/m2, resulting from mass in kilograms and height in metres
 # see: https://en.wikipedia.org/wiki/Body_mass_index
+
+
 def getBMI(weight: float = WEIGHT, height: int = HEIGHT):
-    bmi = weight / ((height / 100) * (height / 100))
+    bmi = weight / ((height / 100) **2)
     return round(bmi, 2)
 
 # Ponderal Index
 # The Ponderal Index (PI) is similar to BMI in that it measures the leanness or corpulence of a
 # person based on their height and weight.
 # see: https://www.calculator.net/bmi-calculator.html?ctype=metric&cage=65&csex=m&cheightfeet=5&cheightinch=10&cpound=160&cheightmeter=180&ckg=72.5&printit=0&x=41&y=24
+
+
 def getPonderalIndex(weight: float = WEIGHT, height: int = HEIGHT):
     h = height / 100
-    poi = weight / (h * h * h)
+    poi = weight / (h**3)
     return round(poi, 2)
 
 
@@ -45,7 +49,6 @@ def getPonderalIndex(weight: float = WEIGHT, height: int = HEIGHT):
 # https://www.calculator.net/calorie-calculator.html?ctype=metric&cage=65&csex=m&cheightfeet=5&cheightinch=10&cpound=165&cheightmeter=178&ckg=72.5&cactivity=1.465&cmop=0&coutunit=c&cformula=m&cfatpct=20&printit=0&x=53&y=16
 # https://calculator-online.net/bmr-calculator/
 # BMR (kcal/day)
-
 
 
 # ---------------------------------
@@ -65,6 +68,8 @@ def getBMR_Mifflin(weight: float = WEIGHT, height: int = HEIGHT, age: float = AG
 # see https://www.omnicalculator.com/health/bmr-katch-mcardle#what-is-the-katch-mcardle-calculator
 # BMR (kcal/day)
 # BMR = 370 + 21.6(1 – F)W
+
+
 def getBMR_KatchMcArdle(weight: float = WEIGHT, fat: float = FAT):
     # BMR = 370 + (21.6 * Lean Body Mass[kg])
     # BMR = 370.00 + 21.60 * (1.00 - fat/100) * weight
@@ -105,7 +110,6 @@ def getMacronutrientDistribution(pal: float = PAL):
     }
 
 
-
 # -------------------------------------------------------------------
 # Body water
 # -------------------------------------------------------------------
@@ -134,6 +138,8 @@ def getFatPercentage(age: float = AGE, sex: str = SEX):
     return round(fat, 2)
 
 # Get fat percentage
+
+
 def getFatPercentage2(weight: float = WEIGHT, height: int = HEIGHT, age: float = AGE, sex: str = SEX):
     # Set a constant to remove from LBM
     if sex == 'female' and age <= 49:
@@ -180,16 +186,24 @@ def getFatPercentage3(weight: float = WEIGHT, height: int = HEIGHT, age: float =
     return round(fatPercentage, 2)
 
 # Body Fat Calculator in %
+
+
 def getFatPercentage4(f: float = 1.00):
     fatPercentage = round((1.281 * getBMI()) - 10.13, 2)
     return round(fatPercentage * f, 2)
 
 
-## ------------------------------------------------------------
-## Lean body mass (LBM), sometimes conflated with fat-free mass,
-## is a component of body composition.
-## https://en.wikipedia.org/wiki/Lean_body_mass
-## ------------------------------------------------------------
+# ------------------------------------------------------------
+# Lean body mass (LBM), sometimes conflated with fat-free mass,
+# is a component of body composition.
+#
+# Lean body mass is what your body would weight if you didn't have any body fat; 
+# that means it counts all the organs, bones, muscles, blood and skin, 
+# and everything else which is not fat but has mass
+#
+# https://www.omnicalculator.com/health/lean-body-mass
+# https://en.wikipedia.org/wiki/Lean_body_mass
+# ------------------------------------------------------------
 # Get LBM coefficient (with impedance)
 def getLBMCoefficient(weight: float = WEIGHT, height: int = HEIGHT, impedance: int = IMPEDANCE, age: float = AGE):
     lbm = (height * 9.058 / 100) * (height / 100)
@@ -202,6 +216,8 @@ def getLBMCoefficient(weight: float = WEIGHT, height: int = HEIGHT, impedance: i
 # Boer
 # For Men: 0.407 × weight[kg] + 0.267 × height[cm] – 19.2
 # For Woman: 0.252 × weight[kg] + 0.473 × height[cm] – 48.3
+
+
 def getLBMCoefficient2(weight: float = WEIGHT, height: int = HEIGHT, sex: str = SEX):
     if sex == 'female':
         lbm = (0.252 * weight) + (0.473 * height) - 48.3
@@ -213,6 +229,8 @@ def getLBMCoefficient2(weight: float = WEIGHT, height: int = HEIGHT, sex: str = 
 # Hume
 # For Men:   0.32810 × weight[kg] + 0.33929 × height[cm] – 29.5336
 # For Women: 0.29569 × weight[kg] + 0.41813 × height[cm] – 43.2933
+
+
 def getLBMCoefficient3(weight: float = WEIGHT, height: int = HEIGHT, sex: str = SEX):
     if sex == 'female':
         # LBM = (0.29569 × W) + (0.41813 × H) − 43.2933
@@ -226,6 +244,8 @@ def getLBMCoefficient3(weight: float = WEIGHT, height: int = HEIGHT, sex: str = 
 # The James Formula
 # For Men:   1.1 × weight[kg] – 128 × ( weight[kg] / height[cm] ) 2
 # For Women: 1.07 × weight[kg] – 148 × ( weight[kg] / height[cm] ) 2
+
+
 def getLBMCoefficient4(weight: float = WEIGHT, height: int = HEIGHT, sex: str = SEX):
     if sex == 'female':
         # LBMf = 1.07*w - 148* wt2 /h2
@@ -238,6 +258,8 @@ def getLBMCoefficient4(weight: float = WEIGHT, height: int = HEIGHT, sex: str = 
 # Fettmasse (FM), Fat mass
 # Fettfreie Masse (FFM), Fat free mass
 # 1. FFM and FM
+
+
 def getFFM(weight: float = WEIGHT, height: int = HEIGHT, age: float = AGE, sex: str = SEX, impedance: int = IMPEDANCE):
     gender = 1.00
     if sex == 'female':
@@ -248,11 +270,13 @@ def getFFM(weight: float = WEIGHT, height: int = HEIGHT, age: float = AGE, sex: 
 #  Kyle UG, Genton L, Karsegard L, Slosman DO, Pichard C. Division of Clinical Nutrition and Dietetics, Geneva University Hospital,
 #  Geneva, Switzerland. Nutrition. 2001 Mar;17(3):248-53.
 
-## ------------------------------------------------------------
-## Muscle Mass
-## ------------------------------------------------------------
+# ------------------------------------------------------------
+# Muscle Mass
+# ------------------------------------------------------------
 # http://www.dev.egofit.de/biadata-org/
 # Muscle Mass
+
+
 def getMuscleMass2(weight: float = WEIGHT, height: int = HEIGHT, age: float = AGE, sex: str = SEX, impedance: int = IMPEDANCE):
     gender = 1.00
     if sex == 'female':
@@ -270,10 +294,6 @@ def getSkeletalMuscleMass(weight: float = WEIGHT, height: int = HEIGHT, age: flo
         gender = 0.00
     SMM = (((height**2) / impedance * 0.401) + (gender * 3.825) + (age * 0.071)) + 5.102
     return SMM
-    
-
-
-
 
 
 def printdata():
@@ -301,5 +321,6 @@ def printdata():
     print("Calorie BMR Harris Benedict:", getBMR_HarrisBenedict())
     print("Calorie BMR Katch Mc Ardle:", getBMR_KatchMcArdle())
     print("--------------------------------------------")
+
 
 printdata()
