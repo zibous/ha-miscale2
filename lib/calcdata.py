@@ -432,7 +432,7 @@ class CalcData():
         if MQTT_HOST and MQTT_PREFIX and data:
             try:
                 if data:
-                    log.debug("MQTT publish {},  payload:{}.".format(topic, json.dumps(data)))
+                    log.info("MQTT publish {},  payload:{}.".format(topic, json.dumps(data)))
                     publish.single(
                         topic,
                         payload=json.dumps(data),
@@ -445,7 +445,7 @@ class CalcData():
                         auth={'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
                     )
                 else:
-                    log.debug("MQTT publish failed, not data present!")
+                    log.error()("MQTT publish failed, not data present!")
             except BaseException as e:
                 log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
                 pass

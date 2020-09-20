@@ -50,11 +50,11 @@ class ScanProcessor():
         # decode data form the mi scale 2 device
         # ------------------------------------------
         if dev.addr == MI2_MAC.lower() and isNewDev:
-            
+
             log.debug("Device {}, New:{}, Newdata:{}".format(dev.addr, isNewDev, isNewData))
 
             mi2_decoder = Miscale2Decoder(dev)
-            
+
             mi_data = mi2_decoder.getData()
 
             if mi_data:
@@ -63,6 +63,7 @@ class ScanProcessor():
                 if mCalc.ready:
                     mCalc.publishdata()
 
+
 def main():
 
     BluetoothFailCounter = 0
@@ -70,18 +71,16 @@ def main():
     while True:
         try:
             scanner = btle.Scanner().withDelegate(ScanProcessor())
-            # log.info("Scanning for devices...")
             devices = scanner.scan(5)  # Adding passive=True to try and fix issues on RPi devices
             time.sleep(TIME_INTERVAL)
         except BTLEDisconnectError as e:
             log.error("BTLE disconnected {}".format(e))
             pass
         except BTLEManagementError as e:
-            sys.stderr.write(f"{datetime.now().strftime(DATEFORMAT_MISCAN)} - Bluetooth connection error: {error}\n")
             log.error("Bluetooth connection error:{}".format(e))
             if BluetoothFailCounter >= 4:
                 cmd = 'hciconfig ' + HCI_DEV + ' down'
-                log.debug("shell command: {}".format(cmd))
+                log.info("shell command: {}".format(cmd))
                 ps = subprocess.Popen(cmd, shell=True)
                 time.sleep(1)
                 cmd = 'hciconfig hci' + HCI_DEV + ' up'
@@ -99,4 +98,5 @@ def main():
 
 
 if __name__ == "__main__":
+    log.info("Start Xiaomi Mi Scale Service Application")
     main()
