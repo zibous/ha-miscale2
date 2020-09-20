@@ -4,17 +4,10 @@ Documentation=https://github.com/zibous/ha-miscale2
 After=network.target
 
 [Service]
-Type=notify
+Type=simple
 User=root
-
-WorkingDirectory=/opt/ha-miscale2/
-ExecStart=/usr/bin/python3 /opt/ha-miscale2/app.py
-
-StandardOutput=inherit
-StandardError=inherit
-
-StandardError=journal
-Environment=PYTHONUNBUFFERED=true
+WorkingDirectory=/opt/ha-miscale2
+ExecStart=/opt/ha-miscale2/service.sh
 Restart=always
 
 [Install]
