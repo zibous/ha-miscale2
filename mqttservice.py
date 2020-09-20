@@ -26,7 +26,7 @@ except Exception as e:
 
 
 # register the application logger
-appLogger = logger.Log(__name__, LOG_LEVEL)
+appLogger = logger.Log(__name__, MQTT_CLEINTID, LOG_LEVEL)
 
 
 def MicsaleData():
@@ -109,5 +109,13 @@ def MicsaleData():
 
 
 # Start main application
-appLogger.info("MiScale MQTT service data application start")
-MicsaleData()
+while True:
+    try:
+        appLogger.info("MiScale MQTT service data application start")
+        MicsaleData()
+    except KeyboardInterrupt:
+        appLogger.info("MiScale MQTT service stopped.")
+        print('')
+        sys.exit(0)
+    except Exception as e:
+        appLogger.error(f"Error while running the script: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")

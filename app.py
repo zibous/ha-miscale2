@@ -19,6 +19,7 @@ if sys.version_info[0] < 3:
 try:
     import os
     import subprocess
+    import asyncio
     from bluepy import btle
     from bluepy.btle import Scanner, BTLEDisconnectError, BTLEManagementError, DefaultDelegate
 
@@ -45,24 +46,20 @@ class ScanProcessor():
         log.debug("Init ScanProcessor")
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
-
-        # -------------------------------------------
-        # decode data form the mi scale 2 device
-        # ------------------------------------------
+        # when this python script discovers a BLE broadcast packet, we can decode the data packet
+        # for each device  in the list of devices    
         if dev.addr == MI2_MAC.lower() and isNewDev:
-
+            # ------------------------------------------
+            # decode data form the mi scale 2 device
+            # ------------------------------------------
             log.debug("Device {}, New:{}, Newdata:{}".format(dev.addr, isNewDev, isNewData))
-
             mi2_decoder = Miscale2Decoder(dev)
-
             mi_data = mi2_decoder.getData()
-
             if mi_data:
                 log.debug("New data present, make calulations and publish...")
                 mCalc = CalcData(mi_data)
                 if mCalc.ready:
                     mCalc.publishdata()
-
 
 def main():
 
@@ -71,7 +68,8 @@ def main():
     while True:
         try:
             scanner = btle.Scanner().withDelegate(ScanProcessor())
-            devices = scanner.scan(5)  # Adding passive=True to try and fix issues on RPi devices
+            # create a list of unique devices that the scanner discovered during a 10-second scan
+            devices = scanner.scan(10)
             time.sleep(TIME_INTERVAL)
         except BTLEDisconnectError as e:
             log.error("BTLE disconnected {}".format(e))
@@ -91,7 +89,9 @@ def main():
             else:
                 BluetoothFailCounter += 1
         except KeyboardInterrupt:
-            sys.exit()
+            log.info("Xiaomi Mi Scale Service Application stopped.")
+            print('')
+            sys.exit(0)
         except Exception as e:
             log.error(f"Error while running the script: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
             pass
@@ -99,4 +99,10 @@ def main():
 
 if __name__ == "__main__":
     log.info("Start Xiaomi Mi Scale Service Application")
+    time.sleep(10)
+    
     main()
+
+    while True:
+      print('Xiaomi Mi Scale Service Application is active...')
+      time.sleep(5)

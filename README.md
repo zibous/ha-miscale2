@@ -80,6 +80,7 @@ Systemd service for  - on systemd powered systems the **recommended** option
    
    $ sudo systemctl daemon-reload
    $ sudo systemctl start ha-miscale.service
+   $ sudo systemctl stop ha-miscale.service
    $ sudo systemctl status ha-miscale.service
    
    $ sudo systemctl enable ha-miscale.service
@@ -168,6 +169,7 @@ The calculation results are saved once as a history in the data folder, publishe
 - https://github.com/oliexdev/openScale<br>
 - https://support.withings.com/hc/en-us/articles/218500778-Body-What-are-the-normal-ranges-for-body-composition-<br>
 - https://googlechrome.github.io/samples/web-bluetooth/scan.html<br>
+- https://github.com/IanHarvey/bluepy/blob/master/docs/scanner.rst<br>
 
 
 # Omron, Medisana, Xiaomi
