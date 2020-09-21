@@ -45,12 +45,12 @@ def publishDeviceState(topicmode: str = 'Online', payload: dict = None):
     mqtt_client = mqtt.client()
     if mqtt_client and mqtt_client.ready:
         if topicmode == 'Online':
-            mqtt_client.publish_simple()(MQTT_AVAILABILITY_TOPIC, topicmode, True)
+            mqtt_client.publish_simple(MQTT_AVAILABILITY_TOPIC, topicmode, True)
         elif topicmode == 'Offline':
-            mqtt_client.publish_simple()(MQTT_AVAILABILITY_TOPIC, topicmode, True)
+            mqtt_client.publish_simple(MQTT_AVAILABILITY_TOPIC, topicmode, True)
         else:
             if payload:
-                mqtt_client.publish_simple()(topicmode, payload, True)
+                mqtt_client.publish(topicmode, payload, True)
 
 
 class ScanProcessor():
