@@ -28,6 +28,7 @@ try:
 
     from conf import *
     from lib import logger
+    from lib import mqtt
 
     from lib.miscale2 import Miscale2Decoder
     from lib.calcdata import CalcData
@@ -40,6 +41,18 @@ except Exception as e:
 log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
 
 
+def publishDeviceState(topicmode: str = 'Online', payload: dict = None):
+    mqtt_client = mqtt.client()
+    if mqtt_client and mqtt_client.ready:
+        if topicmode == 'Online':
+            mqtt_client.publish_simple()(MQTT_AVAILABILITY_TOPIC, topicmode, True)
+        elif topicmode == 'Offline':
+            mqtt_client.publish_simple()(MQTT_AVAILABILITY_TOPIC, topicmode, True)
+        else:
+            if payload:
+                mqtt_client.publish_simple()(topicmode, payload, True)
+
+
 class ScanProcessor():
 
     def __init__(self):
@@ -47,12 +60,30 @@ class ScanProcessor():
 
     def handleDiscovery(self, dev, isNewDev, isNewData):
         # when this python script discovers a BLE broadcast packet, we can decode the data packet
-        # for each device  in the list of devices    
+        # for each device  in the list of devices
         if dev.addr == MI2_MAC.lower() and isNewDev:
             # ------------------------------------------
             # decode data form the mi scale 2 device
             # ------------------------------------------
             log.debug("Device {}, New:{}, Newdata:{}".format(dev.addr, isNewDev, isNewData))
+            if isNewDev:
+                payload = {
+                    'application': __name__,
+                    'message': "new device",
+                    'mac': dev.addr,
+                    'error': False,
+                    "timestamp": str(datetime.today().strftime(DATEFORMAT_MISCAN))
+                }
+                publishDeviceState(MQTT_PREFIX + '/info', payload)
+            if isNewData:
+                payload = {
+                    'application': __name__,
+                    'message': "new data",
+                    'mac': dev.addr,
+                    'error': False,
+                    "timestamp": str(datetime.today().strftime(DATEFORMAT_MISCAN))
+                }
+                publishDeviceState(MQTT_PREFIX + '/info', payload)
             mi2_decoder = Miscale2Decoder(dev)
             mi_data = mi2_decoder.getData()
             if mi_data:
@@ -60,6 +91,7 @@ class ScanProcessor():
                 mCalc = CalcData(mi_data)
                 if mCalc.ready:
                     mCalc.publishdata()
+
 
 def main():
 
@@ -73,10 +105,18 @@ def main():
             time.sleep(TIME_INTERVAL)
         except BTLEDisconnectError as e:
             log.error("BTLE disconnected {}".format(e))
+            payload = {
+                'application': __name__,
+                'message': str(e),
+                'error': True,
+                "timestamp": str(datetime.today().strftime(DATEFORMAT_MISCAN))
+            }
+            publishDeviceState(MQTT_PREFIX + '/info', payload)
             pass
         except BTLEManagementError as e:
             log.error("Bluetooth connection error:{}".format(e))
             if BluetoothFailCounter >= 4:
+                publishDeviceState('Offine')
                 cmd = 'hciconfig ' + HCI_DEV + ' down'
                 log.info("shell command: {}".format(cmd))
                 ps = subprocess.Popen(cmd, shell=True)
@@ -86,13 +126,22 @@ def main():
                 ps = subprocess.Popen(cmd, shell=True)
                 time.sleep(30)
                 BluetoothFailCounter = 0
+                publishDeviceState('Online')
             else:
                 BluetoothFailCounter += 1
         except KeyboardInterrupt:
+            publishDeviceState('Offine')
             log.info("Xiaomi Mi Scale Service Application stopped.")
             print('')
             sys.exit(0)
         except Exception as e:
+            payload = {
+                'application': __name__,
+                'message': str(e),
+                'error': True,
+                "timestamp": str(datetime.today().strftime(DATEFORMAT_MISCAN))
+            }
+            publishDeviceState(MQTT_PREFIX + '/info', payload)
             log.error(f"Error while running the script: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
             pass
 
@@ -100,4 +149,5 @@ def main():
 if __name__ == "__main__":
     log.info("Start Xiaomi Mi Scale Service Application")
     time.sleep(10)
+    publishDeviceState('Online')
     main()

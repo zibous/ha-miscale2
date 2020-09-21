@@ -12,6 +12,7 @@ try:
 
     from conf import *
     from lib import logger
+    from lib import mqtt
 
 except Exception as e:
     print('Import error {}, check requirements.txt'.format(e))
@@ -29,7 +30,7 @@ def last_timeStamp(action: str = "set", value: str = None):
             LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_MISCAN))
     if action == 'get':
         if LAST_TIMESTAMP is None:
-            LAST_TIMESTAMP  = '1900-01-01 00:00:00'
+            LAST_TIMESTAMP = '1900-01-01 00:00:00'
         return LAST_TIMESTAMP
 
 
@@ -197,17 +198,9 @@ class Miscale2Decoder():
     def __publishdata__(self, topic: str = None, data: dict = None):
         try:
             if MQTT_HOST and MQTT_PREFIX and topic and data:
-                publish.single(
-                    topic,
-                    payload=json.dumps(data),
-                    qos=0,
-                    retain=False,
-                    hostname=MQTT_HOST,
-                    port=MQTT_PORT,
-                    client_id=MQTT_CLEINTID,
-                    keepalive=MQTT_KEEPALIVE,
-                    auth={'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
-                )
+                mqtt_client = mqtt.client()
+                if mqtt_client.ready:
+                    mqtt_client.publish(topic, json.dumps(data), True)
         except BaseException as e:
             log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass
