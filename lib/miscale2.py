@@ -200,7 +200,7 @@ class Miscale2Decoder():
             if MQTT_HOST and MQTT_PREFIX and topic and data:
                 mqtt_client = mqtt.client()
                 if mqtt_client.ready:
-                    mqtt_client.publish(topic, json.dumps(data), True)
+                    mqtt_client.publish(topic, data, True)
         except BaseException as e:
             log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass

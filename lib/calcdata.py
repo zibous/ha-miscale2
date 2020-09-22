@@ -16,6 +16,7 @@ try:
     from lib import logger
     from lib import body_metrics
     from lib import body_score
+    from lib import mqtt
     from lib import influxdata
 
 except Exception as e:
@@ -140,10 +141,67 @@ class CalcData():
         current_date = date.today().isoformat()
         return (date.today() - timedelta(days=365 * 18)).isoformat()
 
+    # Maximum Muscular Potential Calculator
+    # Calculate Your Genetic Drug Free Muscle Gaining Potential
+    def maxMuscular(self, calcmode: str = 'martins') -> float:
+        if calcmode == 'martins':
+            # Martin's formula: Height in centimeters - (98 - 102) = Body weight in kilos.
+            MMP = self.height - 102
+        return MMP
+
+    def getMuscleMass2(self):
+        gender = 1.00
+        if self.sex == 'female':
+            gender = 0.00
+        ASMM = -4.211 + (0.267 * (self.height**2) / self.impedance) + (0.095 * self.weight) + (1.909 * gender) + (-0.012 * self.age) + (0.058 * self.impedance)
+        return ASMM
+
+    # Maintenance Caloric Range: 2,218 - 2,534
+    # Deficit Caloric Range: 1,774 - 2,028
+    def getMaintenanceCaloricRange(self) -> int:
+        return {
+            'caloricmin': int(self.weight * 30.80),
+            'caloricmax': int(self.weight * 35.20),
+            'deficitmin': int(self.weight * 24.60),
+            'deficitmax': int(self.weight * 28.20)
+        }
+
+    # Maintenance calorie calculator TDEE (kcal/day)
+    # see: https://www.omnicalculator.com/health/maintenance-calorie
+
+    def getDalyEnergyExpenditure(self):
+        if USER1_ACTIVITY and self.data['bmr']:
+            self.data['tdee'] = int(round(self.data['bmr'] * USER1_ACTIVITY, 0))
+            return self.data['tdee']
+        else:
+            return 0
+
+    # Macronutrient distribution
+    # see: https://www.omnicalculator.com/health/maintenance-calorie
+    # kcal/day
+
+    def getMacronutrientDistribution(self):
+        if "tdee" in self.data and self.data['tdee']:
+            return {
+                "protein": round(self.data['tdee'] * 0.35, 0),
+                "carbohydrates": round(self.data['tdee'] * 0.50, 0),
+                "fat": round(self.data['tdee'] * 0.15, 0)
+            }
+        else:
+            return None
+
+    # Skeletal muscle mass
+    # SMM(kg)=[(height2 / resistance x 0,401) + (gender x 3.825) + (age x -0.071)] + 5.102
+
+    def getSkeletalMuscleMass(self):
+        gender = 1.00
+        if self.sex == 'female':
+            gender = 0.00
+        SMM = (((self.height**2) / self.impedance * 0.401) + (gender * 3.825) + (self.age * 0.071)) + 5.102
+        return SMM
+
     def __setUserData__(self):
-
         if self.data:
-
             self.user = self.user
             if int(self.weight) > USER1_GT:
                 self.user = USER1_NAME
@@ -309,8 +367,12 @@ class CalcData():
             self.data['muscle'] = round(lib.getMuscleMass(), 2)
             self.data['protein'] = round(lib.getProteinPercentage(), 2)
 
-            self.data['bmr'] = round(lib.getBMR(), 2)
-            # self.data['TDEE'] = self.data['bmr'] *
+            self.data['bmr'] = round(lib.getBMR(), 0)
+
+            self.data['caloric'] = self.getMaintenanceCaloricRange()
+            self.data['engergieexp'] = self.getDalyEnergyExpenditure()
+            self.data['macronut'] = self.getMacronutrientDistribution()
+
             self.data['timestamp'] = self.timestamp
             self.data['version'] = self.version
 
@@ -372,13 +434,20 @@ class CalcData():
             pass
 
     def publish2Influxdb(self):
-        if self.data:
+        if self.data and INFLUXDB_MEASUREMENT and IFLUXDB_DATALIST:
             try:
+                measurement = INFLUXDB_MEASUREMENT + self.user.lower()
                 ifx = influxdata.InfuxdbCient()
-                ifx.post(self.data, 'MISCALEDATA_' + self.user)
-                return True
+                ifxdata = {}
+                for field in IFLUXDB_DATALIST:
+                    ifxdata[field] = self.data[field]
+                if ifxdata:
+                    log.debug("Publish to INFLUXDB: {}, data:{}".format(measurement, ifxdata))
+                    ifx.post(ifxdata, measurement)
+                    return True
+
             except BaseException as e:
-                log.error(f"Error {__name__}, Tag: {'MISCALEDATA_' + self.user} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+                log.error(f"Error {__name__}, Tag: {INFLUXDB_MEASUREMENT + self.user.lower()} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
                 pass
 
     def publishdata(self, datasections: dict = None):
@@ -431,19 +500,11 @@ class CalcData():
     def __publishdata__(self, topic: str = MQTT_PREFIX, data: dict = None):
         if MQTT_HOST and MQTT_PREFIX and data:
             try:
-                if data:
+                if data and topic:
                     log.info("MQTT publish {},  payload:{}.".format(topic, json.dumps(data)))
-                    publish.single(
-                        topic,
-                        payload=json.dumps(data),
-                        qos=0,
-                        retain=False,
-                        hostname=MQTT_HOST,
-                        port=MQTT_PORT,
-                        client_id=MQTT_CLEINTID,
-                        keepalive=MQTT_KEEPALIVE,
-                        auth={'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
-                    )
+                    mqtt_client = mqtt.client()
+                    if mqtt_client.ready:
+                        mqtt_client.publish(topic, data, True)
                 else:
                     log.error()("MQTT publish failed, not data present!")
             except BaseException as e:

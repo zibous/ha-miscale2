@@ -5,16 +5,15 @@ import sys
 sys.path.append("..")
 
 try:
-
-    import paho.mqtt.publish as publish
     import os
+    import paho.mqtt.publish as publish
     import json
 
-    from config import *
-    from common import logger
+    from conf import *
+    from lib import logger
 
 except Exception as e:
-    print('Import error {}, check requirements.txt'.format(e))
+    print(f"Import error: {str(e)} line {sys.exc_info()[-1].tb_lineno}, check requirements.txt")
 
 log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
 
@@ -31,6 +30,8 @@ class client:
         self.port = port
         self.clientId = clientId
         self.auth = auth
+        if MQTT_USERNAME and MQTT_PASSWORD and not auth:
+            self.auth = {'username': MQTT_USERNAME, 'password': MQTT_PASSWORD}
         if self.mqttBrocker:
             self.ready = True
 
@@ -66,8 +67,8 @@ class client:
             log.error(f"Error Publish LWT {self.mqttBrocker}, {topic}, {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass
 
-
     # publish data to the defined mqtt brocker
+
     def publish(self, topic: str = MQTT_TOPIC, payload: dict = None, retain: bool = False, qos: int = 0, keepalive: int = MQTT_TIMEOUT):
         if not self.ready:
             return

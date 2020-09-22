@@ -55,6 +55,22 @@ INFLUXDB_PORT = 8086
 INFLUXDB_USER = 'admin'
 INFLUXDB_PASSWORD = '3parpXA7AhN3B3i5si4E'
 INFLUXDB_LOG_DIR = None  # './data/influxdb'
+INFLUXDB_MEASUREMENT = 'miscale_'
+IFLUXDB_DATALIST = [
+    "bmi",
+    "weight",
+    "impedance",
+    "lbm",
+    "fat",
+    "visceral",
+    "water",
+    "bone",
+    "muscle",
+    "protein",
+    "bmr",
+    "tdee"
+
+]
 
 """SETTINGS MISCALE V2
 """

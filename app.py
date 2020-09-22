@@ -34,7 +34,7 @@ try:
     from lib.calcdata import CalcData
 
 except Exception as e:
-    print('Import error {}, check requirements.txt'.format(e))
+    print(f"Import error: {str(e)} line {sys.exc_info()[-1].tb_lineno}, check requirements.txt")
     sys.exit(1)
 
 

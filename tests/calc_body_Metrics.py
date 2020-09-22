@@ -39,10 +39,10 @@ class bodyMetrics:
     # Deficit Caloric Range: 1,774 - 2,028
     def getMaintenanceCaloricRange(self) -> int:
         return {
-            'MCR_MIN': int(self.weight * 30.80),
-            'MCR_MAX': int(self.weight * 35.20),
-            'DCR_MIN': int(self.weight * 24.60),
-            'DCR_MAX': int(self.weight * 28.20)
+            'caloricmin': int(self.weight * 30.80),
+            'caloricmax': int(self.weight * 35.20),
+            'deficitmin': int(self.weight * 24.60),
+            'Ddeficitmax': int(self.weight * 28.20)
         }
 
     def print(self):
