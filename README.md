@@ -159,8 +159,11 @@ The calculation results are saved once as a history in the data folder, publishe
 - https://www.omnicalculator.com/health/bmr-katch-mcardle#what-is-the-katch-mcardle-calculator<br>
 - https://www.omnicalculator.com/health/maintenance-calorie<br>
 - https://en.wikipedia.org/wiki/Body_water<br>
+- https://de.wikipedia.org/wiki/Ponderal-Index<br>
 - https://en.wikipedia.org/wiki/Body_fat_percentage<br>
 - https://en.wikipedia.org/wiki/Lean_body_mass<br>
+- http://elsenaju.de/AMI-Rechner.html<br>
+- http://elsenaju.de/Kalorien-Bedarf-Rechner.html<br>
 - https://www.calculator.net/lean-body-mass-calculator.html<br>
 - http://www.dev.egofit.de/biadata-org/<br>
 - https://github.com/zewelor/bt-mqtt-gateway<br>

@@ -200,6 +200,38 @@ class CalcData():
         SMM = (((self.height**2) / self.impedance * 0.401) + (gender * 3.825) + (self.age * 0.071)) + 5.102
         return SMM
 
+    # Corpulence index - Ponderal Index (PI)
+    # The Corpulence Index (CI) or Ponderal Index (PI) is a measure of leanness (corpulence)
+    # of a person calculated as a relationship between mass and height.
+    # It was first proposed in 1921 as the "Corpulence measure" by Swiss physician
+    # Fritz Rohrer and hence is also known as Rohrer's Index.
+    # It is similar to the body mass index, but the mass is normalized with the
+    # third power of body height rather than the second power.
+
+    def getPonderalIndex(self):
+        poi = self.weight / ((self.height / 100) ** 3)
+        return round(poi, 2)
+
+    # FFMI
+    # Body Mass Index (BMI) is a general estimate of one’s health and it’s a decent estimation
+    # for the general population. However, its limitations make it worthless to those who exercise
+    # regularly and to those who lift weights. FFMI is a much more effective gauge of ones
+    # fitness level for athletes, fitness enthusiasts and individuals who have more muscle
+    # mass than the general population. FFMI is a much more effective gauge for ones fitness level,
+    # for anyone who takes their fitness seriously.
+
+    def getFatfreemass(self, calcmode: str = 'normalised') -> float:
+        BF = float(self.data['fat'])
+        if calcmode == 'normalised':
+            # FFMI is normalised due to taller athletes usually being bigger overall.
+            FFMI = (self.weight * (1 - (BF / 100))) + 6.10 * (1.8 - (self.height / 100))
+        else:
+            FFMI = (self.weight * (1 - (BF / 100)))
+        return round(FFMI, 2)
+
+    def getFatfreemassIndex(self, calcmode: str = 'normalised') -> float:
+        return round(self.getFatfreemass(calcmode) / ((self.height / 100)**2), 2)
+
     def __setUserData__(self):
         if self.data:
             self.user = self.user
@@ -323,7 +355,6 @@ class CalcData():
             pass
 
     def __setBodyMetricsdata__(self) -> dict():
-
         try:
             if self.data and 'bmr' in self.data:
                 # allready calculated
@@ -341,6 +372,7 @@ class CalcData():
             self.data['metabolic_age'] = round(lib.getMetabolicAge(), 2)
             self.data['impedance'] = self.impedance
             self.data['bmi'] = round(lib.getBMI(), 2)
+            self.data['poi'] = self.getPonderalIndex()
             self.data['bodytype'] = BODY_SCALE_TPYES[lib.getBodyType()]
 
             # weight
@@ -349,8 +381,8 @@ class CalcData():
             self.data['targetweight'] = self.userscores['WEIGHT']
             self.data['unit'] = self.unit
 
-            self.data['lbm'] = round(lib.getLBMCoefficient(), 2)
             # fat
+            self.data['lbm'] = round(lib.getLBMCoefficient(), 2)
             self.data['fat'] = round(lib.getFatPercentage(), 2)
             self.data['fattype'] = lib.getFatMassToIdeal()['type']
             # not a valid data from getFatMassToIdeal, use usersettings instead
@@ -358,21 +390,18 @@ class CalcData():
                 self.data['idealfat'] = self.userscores['FAT']
             else:
                 self.data['idealfat'] = round(lib.getFatMassToIdeal()['mass'], 2)
-
             self.data['visceral'] = round(lib.getVisceralFat(), 2)
 
             # water, bone, muscle, protein
             self.data['water'] = round(lib.getWaterPercentage(), 2)
             self.data['bone'] = round(lib.getBoneMass(), 2)
             self.data['muscle'] = round(lib.getMuscleMass(), 2)
+
+            self.data['ffm'] = self.getFatfreemass()
+            self.data['ffmi'] = self.getFatfreemassIndex()
             self.data['protein'] = round(lib.getProteinPercentage(), 2)
-
             self.data['bmr'] = round(lib.getBMR(), 0)
-
-            self.data['caloric'] = self.getMaintenanceCaloricRange()
             self.data['engergieexp'] = self.getDalyEnergyExpenditure()
-            self.data['macronut'] = self.getMacronutrientDistribution()
-
             self.data['timestamp'] = self.timestamp
             self.data['version'] = self.version
 
@@ -424,6 +453,10 @@ class CalcData():
                 self.bodyscores['scores']['bones'] = score.getBoneDeductScore()
                 self.bodyscores['scores']['bmr'] = score.getBasalMetabolismDeductScore()
                 self.bodyscores['scores']['protein'] = score.getProteinDeductScore()
+                self.bodyscores['caloric'] = self.getMaintenanceCaloricRange()
+                self.bodyscores['engergieexp'] = self.getDalyEnergyExpenditure()
+                self.bodyscores['macronut'] = self.getMacronutrientDistribution()
+
                 self.bodyscores['version'] = self.version
                 self.bodyscores['timestamp'] = self.timestamp
 
