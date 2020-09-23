@@ -86,7 +86,6 @@ MI2_DATAFLAG = 1
 MI2_NOSERVICE = 2
 MI2_LOCALNAME = 9
 MI2_MANUFACTORID = 255
-MI2_TIMEZONE = 'Europe/Vaduz'
 HCI_DEV = 'hci0'  # sudo hciconfig
 TIME_INTERVAL = 30
 ATTRIBUTION = 'Data provided by Peter Siebler'

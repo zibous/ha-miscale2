@@ -346,7 +346,7 @@ class CalcData():
             self.simpledata['water'] = round(0.72 * (-1.976 + 0.907 * self.weight), 2)
             self.simpledata['fat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
             # self.simpledata['leanfat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
-            self.simpledata['timestamp'] = self.timestamp
+            self.simpledata['timestamp'] = str(self.timestamp)
             self.simpledata['version'] = self.version
             self.simpledata["icon"] = "mdi:scale-bathroom"
             self.simpledata['attribution'] = ATTRIBUTION
@@ -401,7 +401,7 @@ class CalcData():
             self.data['ffmi'] = self.getFatfreemassIndex()
             self.data['protein'] = round(lib.getProteinPercentage(), 2)
             self.data['bmr'] = round(lib.getBMR(), 0)
-            self.data['timestamp'] = self.timestamp
+            self.data['timestamp'] = str(self.timestamp)
             self.data['version'] = self.version
 
             self.__recalibrate__()
@@ -457,7 +457,7 @@ class CalcData():
                 self.bodyscores['macronut'] = self.getMacronutrientDistribution()
 
                 self.bodyscores['version'] = self.version
-                self.bodyscores['timestamp'] = self.timestamp
+                self.bodyscores['timestamp'] = str(self.timestamp)
 
                 log.debug("Bodyscores found for {}: {}".format(self.user, self.bodyscores))
 

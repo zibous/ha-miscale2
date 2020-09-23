@@ -29,10 +29,10 @@ def last_timeStamp(action: str = "set", value: str = None):
         if value:
             LAST_TIMESTAMP = value
         else:
-            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_UTC))
+            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_MISCAN))
     if action == 'get':
         if LAST_TIMESTAMP is None:
-            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_UTC))
+            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_MISCAN))
         return LAST_TIMESTAMP
 
 
@@ -119,11 +119,8 @@ class Miscale2Decoder():
                     int((self.data[18:20]), 16),
                     int((self.data[20:22]), 16)
                 )
-                log.debug("Timestamp: {}".format(mi_timestamp))
                 mi_datetime = datetime.strptime(mi_timestamp, DATEFORMAT_MISCAN)
-                utc = pytz.utc
-                mytz = pytz.timezone(MI2_TIMEZONE)
-                mi_datetime = mytz.localize(mi_datetime)
+                log.debug("Mi-Date: {}, Current time: {} vs. Last scan time: {}".format(mi_timestamp, mi_datetime, LAST_TIMESTAMP))
                 return mi_datetime
         except BaseException as e:
             log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
@@ -136,7 +133,7 @@ class Miscale2Decoder():
                 "calcweight": float(self.calcweight),
                 "unit": self.unit,
                 "impedance": int(self.impedance),
-                "timestamp": self.timestamp,
+                "timestamp": str(self.timestamp),
                 "scantime": str(datetime.today().strftime(DATEFORMAT_MISCAN))
             }
             return True
