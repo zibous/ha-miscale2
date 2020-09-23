@@ -32,7 +32,7 @@ def last_timeStamp(action: str = "set", value: str = None):
             LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_UTC))
     if action == 'get':
         if LAST_TIMESTAMP is None:
-            LAST_TIMESTAMP = '1900-01-01 00:00:00'
+            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_UTC))
         return LAST_TIMESTAMP
 
 
