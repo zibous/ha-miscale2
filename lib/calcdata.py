@@ -54,7 +54,7 @@ class CalcData():
             self.impedance = int(self.data["impedance"])
             if self.data["unit"] and "unit" in self.data:
                 self.unit = self.data["unit"]
-            if self.data["timestamp"] and "timstamp" in self.data:
+            if self.data["timestamp"] and "timestamp" in self.data:
                 self.timestamp = self.data["timestamp"]
             self.__setUserData__()
             self.ready = True
@@ -401,7 +401,6 @@ class CalcData():
             self.data['ffmi'] = self.getFatfreemassIndex()
             self.data['protein'] = round(lib.getProteinPercentage(), 2)
             self.data['bmr'] = round(lib.getBMR(), 0)
-            self.data['engergieexp'] = self.getDalyEnergyExpenditure()
             self.data['timestamp'] = self.timestamp
             self.data['version'] = self.version
 
@@ -471,12 +470,13 @@ class CalcData():
             try:
                 measurement = INFLUXDB_MEASUREMENT + self.user.lower()
                 ifx = influxdata.InfuxdbCient()
-                ifxdata = {}
+                ifx_flields = {}
                 for field in IFLUXDB_DATALIST:
-                    ifxdata[field] = self.data[field]
-                if ifxdata:
-                    log.debug("Publish to INFLUXDB: {}, data:{}".format(measurement, ifxdata))
-                    ifx.post(ifxdata, measurement)
+                    if field in self.data:
+                        ifx_flields[field] = self.data[field]
+                if ifx_flields:
+                    log.debug("Publish to INFLUXDB: {}, Time:{}, fields:{}".format(measurement, self.data['timestamp'], ifx_flields))
+                    ifx.post(ifx_flields,measurement,self.data['timestamp'])
                     return True
 
             except BaseException as e:

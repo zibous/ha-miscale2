@@ -57,6 +57,7 @@ INFLUXDB_PASSWORD = '3parpXA7AhN3B3i5si4E'
 INFLUXDB_LOG_DIR = None  # './data/influxdb'
 INFLUXDB_MEASUREMENT = 'miscale_'
 IFLUXDB_DATALIST = [
+    "metabolic_age",
     "bmi",
     "weight",
     "impedance",
@@ -68,8 +69,9 @@ IFLUXDB_DATALIST = [
     "muscle",
     "protein",
     "bmr",
+    "ffm",
+    "ffmi",
     "tdee"
-
 ]
 
 """SETTINGS MISCALE V2
@@ -84,7 +86,7 @@ MI2_DATAFLAG = 1
 MI2_NOSERVICE = 2
 MI2_LOCALNAME = 9
 MI2_MANUFACTORID = 255
-
+MI2_TIMEZONE = 'Europe/Vaduz'
 HCI_DEV = 'hci0'  # sudo hciconfig
 TIME_INTERVAL = 30
 ATTRIBUTION = 'Data provided by Peter Siebler'

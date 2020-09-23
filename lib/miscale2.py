@@ -7,6 +7,8 @@ sys.path.append("..")
 try:
     from datetime import datetime
     import time
+    import pytz
+
     import paho.mqtt.publish as publish
     import json
 
@@ -27,7 +29,7 @@ def last_timeStamp(action: str = "set", value: str = None):
         if value:
             LAST_TIMESTAMP = value
         else:
-            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_MISCAN))
+            LAST_TIMESTAMP = str(datetime.today().strftime(DATEFORMAT_UTC))
     if action == 'get':
         if LAST_TIMESTAMP is None:
             LAST_TIMESTAMP = '1900-01-01 00:00:00'
@@ -61,7 +63,7 @@ class Miscale2Decoder():
         self.unit = 'kg'
 
         self.devicestate = 'unknown'
-        self.lastscan = last_timeStamp('get')  # str(datetime.today().strftime(DATEFORMAT_MISCAN))
+        self.lastscan = last_timeStamp('get')
 
         self.resultData = None
 
@@ -107,27 +109,25 @@ class Miscale2Decoder():
         log.debug("Impedance  = {} Ω,  p1:{}, p2:{}".format(self.impedance, self.data[24:26], self.data[22:24]))
 
     def __decodeTimestamp__(self):
-        if self.data:
-            log.debug("Timestamp: {}-{}-{} {}:{}:{}".format(
-                self.data[10:12] + self.data[8:10],
-                self.data[12:14], self.data[14:16],
-                self.data[16:18], self.data[18:20],
-                self.data[20:22])
-            )
-            return datetime.strptime(
-                str(int((self.data[10:12] + self.data[8:10]), 16))
-                + "-"
-                + str(int((self.data[12:14]), 16))
-                + "-"
-                + str(int((self.data[14:16]), 16))
-                + " "
-                + str(int((self.data[16:18]), 16))
-                + ":"
-                + str(int((self.data[18:20]), 16))
-                + ":"
-                + str(int((self.data[20:22]), 16)),
-                DATEFORMAT_MISCAN,
-            )
+        try:
+            if self.data:
+                mi_timestamp = "{}-{}-{} {}:{}:{}".format(
+                    int((self.data[10:12] + self.data[8:10]), 16),
+                    int((self.data[12:14]), 16),
+                    int((self.data[14:16]), 16),
+                    int((self.data[16:18]), 16),
+                    int((self.data[18:20]), 16),
+                    int((self.data[20:22]), 16)
+                )
+                log.debug("Timestamp: {}".format(mi_timestamp))
+                mi_datetime = datetime.strptime(mi_timestamp, DATEFORMAT_MISCAN)
+                utc = pytz.utc
+                mytz = pytz.timezone(MI2_TIMEZONE)
+                mi_datetime = mytz.localize(mi_datetime)
+                return mi_datetime
+        except BaseException as e:
+            log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+            return datetime.utcnow().strftime(DATEFORMAT_UTC)
 
     def __setResults__(self):
         if self.measured and self.impedance:
