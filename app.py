@@ -18,6 +18,7 @@ if sys.version_info[0] < 3:
 
 try:
     import os
+    import signal
     import subprocess
     import asyncio
     from bluepy import btle
@@ -38,7 +39,7 @@ except Exception as e:
     sys.exit(1)
 
 
-log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
+log = logger.Log('MI_SCALE2_APP', MI2_SHORTNAME, LOG_LEVEL)
 
 
 def publishDeviceState(topicmode: str = 'Online', payload: dict = None):
@@ -52,6 +53,12 @@ def publishDeviceState(topicmode: str = 'Online', payload: dict = None):
             if payload:
                 mqtt_client.publish(topicmode, payload, True)
 
+
+def handler(signum, frame):
+    publishDeviceState('Offline')
+    log.info("Xiaomi Mi Scale Service Application stopped.")
+    print('')
+    sys.exit(0)
 
 class ScanProcessor():
 
@@ -116,7 +123,7 @@ def main():
         except BTLEManagementError as e:
             log.error("Bluetooth connection error:{}".format(e))
             if BluetoothFailCounter >= 4:
-                publishDeviceState('Offine')
+                publishDeviceState('Offline')
                 cmd = 'hciconfig ' + HCI_DEV + ' down'
                 log.info("shell command: {}".format(cmd))
                 ps = subprocess.Popen(cmd, shell=True)
@@ -129,11 +136,6 @@ def main():
                 publishDeviceState('Online')
             else:
                 BluetoothFailCounter += 1
-        except KeyboardInterrupt:
-            publishDeviceState('Offine')
-            log.info("Xiaomi Mi Scale Service Application stopped.")
-            print('')
-            sys.exit(0)
         except Exception as e:
             payload = {
                 'application': __name__,
@@ -148,6 +150,7 @@ def main():
 
 if __name__ == "__main__":
     log.info("Start Xiaomi Mi Scale Service Application")
+    signal.signal(signal.SIGINT, handler)
     time.sleep(10)
     publishDeviceState('Online')
     main()

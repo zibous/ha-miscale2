@@ -42,7 +42,7 @@ class client:
             if payload:
                 if(self.auth):
                     # publish with authenification
-                    log.info("Publish LWT with authenification {}, {}".format(self.mqttBrocker, topic))
+                    log.debug("Publish LWT with authenification {}, {}".format(self.mqttBrocker, topic))
                     publish.single(topic,
                                    payload=payload,
                                    qos=qos,
@@ -54,7 +54,7 @@ class client:
                                    auth=self.auth)
                 else:
                     # publish w/o authenification
-                    log.info("Publish LWT w/o authenification {}, {}".format(self.mqttBrocker, topic))
+                    log.debug("Publish LWT w/o authenification {}, {}".format(self.mqttBrocker, topic))
                     publish.single(topic,
                                    payload=payload,
                                    qos=qos,

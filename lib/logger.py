@@ -32,6 +32,14 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 
+
+# LOG_LEVEL = 10   ## LOG_LEVEL DEBUG: 10
+# LOG_LEVEL = 20   ## LOG_LEVEL INFO: 20
+# LOG_LEVEL = 30   ## LOG_LEVEL WARNING: 30
+# LOG_LEVEL = 40   ## LOG_LEVEL ERROR: 40
+# LOG_LEVEL = 50   ## LOG_LEVEL CRITICAL: 50
+# LOG_LEVEL = 100  ## LOG_LEVEL DISABLED: 100
+
 class Log(object):
     """Logging wrapper for better output
     """
