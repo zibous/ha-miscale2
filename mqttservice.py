@@ -18,7 +18,7 @@ try:
 
     from conf import *
     from lib import logger
-    from lib.calcdata import CalcData
+    from lib import calcdata
 
 except Exception as e:
     print('Import error {}, check requirements.txt'.format(e))
@@ -26,7 +26,7 @@ except Exception as e:
 
 
 # register the application logger
-appLogger = logger.Log(__name__, MQTT_CLEINTID, LOG_LEVEL)
+appLogger = logger.Log("MQTTSERVICE", MQTT_CLEINTID, LOG_LEVEL)
 
 
 def MicsaleData():
@@ -36,10 +36,10 @@ def MicsaleData():
     def on_connect(client, userdata, flags, rc):
         # The callback for when the client receives a CONNACK response from the server.
         if rc == mqtt.CONNACK_ACCEPTED:
-            appLogger.debug("{} connected OK, subscribe to topic {}".format(MQTT_HOST, MQTT_TOPIC))
+            appLogger.debug("{} connected OK, subscribe to topic {}".format(MQTT_HOST, MQTT_DATATOPIC))
             # Subscribing in on_connect() means that if we lose the connection and
             # reconnect then subscriptions will be renewed.
-            client.subscribe(MQTT_TOPIC)
+            client.subscribe(MQTT_DATATOPIC)
         else:
             appLogger.error("{} Bad connection, returned code= {}".format(MQTT_HOST, rc))
 
@@ -50,16 +50,21 @@ def MicsaleData():
         # The on_message callback is called for each message received ...
         appLogger.info("MQTT Message received topic {}".format(msg.topic))
         # make all calculations
-        if(msg.topic == MQTT_TOPIC):
+        if(msg.topic == MQTT_DATATOPIC):
             # make the calculations
             data = json.loads(msg.payload)
-            mCalc = CalcData(data)
+            # data = {
+            #     "measured": float(data['gewicht']),
+            #     "calcweight": 70.65,
+            #     "unit": 'kg',
+            #     "impedance": impedance,
+            #     "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
+            #     "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+            # }
+            mCalc = calcdata.CalcData(data, True)
             if mCalc.ready:
                 mCalc.publishdata()
-                # influxdb
-                if INFLUXDB_HOST:
-                    mCalc.publish2Influxdb()
-
+            
     def on_disconnect(client, userdata, rc):
         # he on_disconnect() callback is called when the client disconnects from the broker.
         if rc != 1:

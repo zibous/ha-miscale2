@@ -21,7 +21,6 @@
 
 #define appversion "1.0.0"
 
-
 String mqtt_clientId = String(clientId + base_topic);                                  //esp32_bodyscale
 String mqtt_topic_subscribe = String(mqtt_command + base_topic);                       //cmnd/bodyscale
 String mqtt_topic_telemetry = String(mqtt_telemetry + base_topic + mqtt_tele_status);  //tele/bodyscale/status
@@ -153,7 +152,7 @@ void reconnect() {
             while (!bSubscribed) {
                 bSubscribed = mqtt_client.subscribe(mqtt_topic_subscribe.c_str());
             }
-
+            mqtt_client.publish(mqtt_topic_lwt.c_str(), 'Online', true);
             mqtt_client.setCallback(callback);
             mqtt_client.loop();
         } else {
@@ -201,7 +200,6 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
 };
 
 void bodyScaleDevice(BLEAdvertisedDevice d) {
-
     Serial.println("");
     Serial.println("NEW DATA -----------------------------------------");
     String hex;
@@ -410,9 +408,9 @@ void ScanBLE() {
         if (weight > 0 and impedance > 0 and lastTimestamp != time) {
             lastTimestamp = time;
 
-            publish_data = String("{\"weight\": ");
+            publish_data = String("{\"measured\": ");
             publish_data += String(weight);
-            publish_data += String(", \"measured\": ");
+            publish_data += String(", \"calcweight\": ");
             publish_data += String(measured);
             publish_data += String(", \"impedance\": ");
             publish_data += String(int(impedance));
@@ -425,6 +423,8 @@ void ScanBLE() {
             publish_data += String("\", \"version\":\"");
             publish_data += String(appversion);
             publish_data += String("\", \"timestamp\":\"");
+            publish_data += time;
+            publish_data += String("\", \"scantime\":\"");
             publish_data += time;
             publish_data += String("\"}");
 

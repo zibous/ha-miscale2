@@ -93,7 +93,8 @@ def testcase1():
     line_count = 0
     for data in dict_list:
         # simulate the impedance from the history values
-        impedance = int((450 / 54) * float(data['wasser']))
+        # impedance = int((450 / 54) * float(data['wasser']))
+        impedance = int((175**2) / float(data['wasser'])
         scaledata = {
             "measured": float(data['gewicht']),
             "calcweight": 70.65,

@@ -39,6 +39,7 @@ MQTT_PASSWORD = '8DmLcN7YPGmg8q9jy63C'
 MQTT_DISCOVERY = True
 MQTT_DISCOVERY_PREFIX = 'homeassistant'
 MQTT_AVAILABILITY_TOPIC = 'tele/miscale2/LWT'
+MQTT_DATATOPIC = 'tele/bodyscale/data'
 MQTT_TOPIC = 'tele/miscale2/data'
 MQTT_PREFIX = 'tele/miscale2'
 MQTT_CLEINTID = 'misacle.service'
