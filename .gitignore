@@ -4,10 +4,12 @@ settings.py
 .env
 config.py
 conf.py
+config.h
 internal/
 archiv/
 .history/
 *.log
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
