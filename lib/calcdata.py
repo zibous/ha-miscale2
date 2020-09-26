@@ -52,12 +52,13 @@ class CalcData():
         if self.data and "measured" in self.data and "impedance" in self.data:
             self.weight = float(self.data["measured"])
             self.impedance = int(self.data["impedance"])
-            if self.data["unit"] and "unit" in self.data:
+            if "unit" in self.data:
                 self.unit = self.data["unit"]
-            if self.data["timestamp"] and "timestamp" in self.data:
+            if "timestamp" in self.data:
                 self.timestamp = self.data["timestamp"]
             self.__setUserData__()
             self.ready = True
+        
 
     def getData(self, mode: str = 'simple', dataformat: str = 'debug'):
         try:
@@ -181,7 +182,7 @@ class CalcData():
     # kcal/day
 
     def getMacronutrientDistribution(self):
-        if "tdee" in self.data and self.data['tdee']:
+        if "tdee" in self.data:
             return {
                 "protein": round(self.data['tdee'] * 0.35, 0),
                 "carbohydrates": round(self.data['tdee'] * 0.50, 0),
@@ -344,8 +345,7 @@ class CalcData():
             # simple caclulation for the water, fat.....
             self.simpledata['bmi'] = round((self.weight / (self.height ** 2)) * 10000, 2)
             self.simpledata['water'] = round(0.72 * (-1.976 + 0.907 * self.weight), 2)
-            self.simpledata['fat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
-            # self.simpledata['leanfat'] = round((1.281 * self.data['bmi']) - 10.13, 2)
+            self.simpledata['fat'] = round((1.281 * self.simpledata['bmi']) - 10.13, 2)
             self.simpledata['timestamp'] = self.timestamp
             self.simpledata['version'] = self.version
             self.simpledata["icon"] = "mdi:scale-bathroom"

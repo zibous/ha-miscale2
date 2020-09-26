@@ -60,6 +60,7 @@ def handler(signum, frame):
     print('')
     sys.exit(0)
 
+
 class ScanProcessor():
 
     def __init__(self):
@@ -97,7 +98,13 @@ class ScanProcessor():
                 log.debug("New data present, make calulations and publish...")
                 mCalc = CalcData(mi_data)
                 if mCalc.ready:
-                    mCalc.publishdata()
+                    publishmode = {
+                        "fulldata": True,
+                        "scores": True,
+                        "simpledata": True,
+                        "influxdb": True
+                    }
+                    mCalc.publishdata(publishmode)
 
 
 def main():

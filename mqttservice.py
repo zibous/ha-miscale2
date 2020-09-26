@@ -18,7 +18,7 @@ try:
 
     from conf import *
     from lib import logger
-    from lib import calcdata
+    from lib.calcdata import CalcData
 
 except Exception as e:
     print('Import error {}, check requirements.txt'.format(e))
@@ -48,23 +48,24 @@ def MicsaleData():
 
     def on_message(client, userdata, msg):
         # The on_message callback is called for each message received ...
-        appLogger.info("MQTT Message received topic {}".format(msg.topic))
+        appLogger.info("New MQTT Message received topic {}".format(msg.topic))
         # make all calculations
         if(msg.topic == MQTT_DATATOPIC):
             # make the calculations
-            data = json.loads(msg.payload)
-            # data = {
-            #     "measured": float(data['gewicht']),
-            #     "calcweight": 70.65,
-            #     "unit": 'kg',
-            #     "impedance": impedance,
-            #     "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
-            #     "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
-            # }
-            mCalc = calcdata.CalcData(data, True)
-            if mCalc.ready:
-                mCalc.publishdata()
-            
+            data = json.loads(str(msg.payload.decode("utf-8")))
+            if data:
+                mCalc = CalcData(data, True)
+                if mCalc.ready:
+                    publishmode = {
+                        "fulldata": True,
+                        "scores": True,
+                        "simpledata": True,
+                        "influxdb": True
+                    }
+                    mCalc.publishdata(publishmode)
+            else:
+                appLogger.error("Missing Data for {}".format(MQTT_DATATOPIC))
+
     def on_disconnect(client, userdata, rc):
         # he on_disconnect() callback is called when the client disconnects from the broker.
         if rc != 1:
