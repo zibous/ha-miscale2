@@ -123,7 +123,13 @@ Informations
     mCalc = calcdata.CalcData(data, True)
     mi_data = mCalc.getData('data')
     if mCalc.ready:
-         mCalc.publishdata()
+         publishmode = {
+            "fulldata": True,
+            "scores": True,
+            "simpledata": True,
+            "influxdb": True
+         }
+         mCalc.publishdata(publishmode)
     else:
         log.error("No data present !")
   ```

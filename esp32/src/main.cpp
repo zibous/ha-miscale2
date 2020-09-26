@@ -18,8 +18,8 @@
 #include <WiFiUdp.h>
 
 #include "config.h"
-
-#define appversion "1.0.0"
+#include "time.h"
+#define appversion "1.0.4"
 
 String mqtt_clientId = String(clientId + base_topic);                                  //esp32_bodyscale
 String mqtt_topic_subscribe = String(mqtt_command + base_topic);                       //cmnd/bodyscale
@@ -32,6 +32,7 @@ uint64_t unNextTime = 0;
 
 String publish_data;
 String lastTimestamp = "1900-01-01 00:00:00";
+String timestamp = lastTimestamp;
 
 WiFiClient espClient;
 PubSubClient mqtt_client(espClient);
@@ -40,6 +41,13 @@ const int wdtTimeout = 1000000;  //time in ms to trigger the watchdog
 hw_timer_t *timer = NULL;
 
 uint8_t unNoImpedanceCount = 0;
+
+// ntp server
+// see: https://lastminuteengineers.com/esp32-ntp-server-date-time-tutorial/
+const char *ntpServer = "europe.pool.ntp.org";
+// For UTC +1.00 : 1 * 60 * 60 : 3600
+const long gmtOffset_sec = 3600;
+const int daylightOffset_sec = 0;  // no daylightOffset !
 
 void IRAM_ATTR resetModule() {
     ets_printf("reboot due to watchdog timeout\n");
@@ -55,6 +63,58 @@ int16_t stoi2(String input, uint16_t index1) {
     // Serial.print("Substring : ");
     // Serial.println((input.substring(index1 + 2, index1 + 4) + input.substring(index1, index1 + 2)).c_str());
     return (int16_t)(strtol((input.substring(index1 + 2, index1 + 4) + input.substring(index1, index1 + 2)).c_str(), NULL, 16));
+}
+
+void setTimestamp() {
+    time_t rawtime;
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        Serial.println("Failed to obtain time");
+        return;
+    }
+    char timeStringBuff[50];  //50 chars should be enough
+    // strftime(timeStringBuff, sizeof(timeStringBuff), "%A, %B %d %Y %H:%M:%S", &timeinfo);
+    strftime(timeStringBuff, sizeof(timeStringBuff), "%Y-%m-%d %H:%M:%S", &timeinfo);
+    // print like "const char*"
+    // Serial.println(timeStringBuff);
+    //Optional: Construct String object
+    String asString(timeStringBuff);
+    timestamp = String(timeStringBuff);
+}
+
+void printLocalTime() {
+    struct tm timeinfo;
+    if (!getLocalTime(&timeinfo)) {
+        Serial.println("Failed to obtain time");
+        return;
+    }
+    Serial.println(&timeinfo, "%Y-%m-%d %H:%M:%S");
+
+    // Serial.print("Day of week: ");
+    // Serial.println(&timeinfo, "%A");
+    // Serial.print("Month: ");
+    // Serial.println(&timeinfo, "%B");
+    // Serial.print("Day of Month: ");
+    // Serial.println(&timeinfo, "%d");
+    // Serial.print("Year: ");
+    // Serial.println(&timeinfo, "%Y");
+    // Serial.print("Hour: ");
+    // Serial.println(&timeinfo, "%H");
+    // Serial.print("Hour (12 hour format): ");
+    // Serial.println(&timeinfo, "%I");
+    // Serial.print("Minute: ");
+    // Serial.println(&timeinfo, "%M");
+    // Serial.print("Second: ");
+    // Serial.println(&timeinfo, "%S");
+
+    // Serial.println("Time variables");
+    // char timeHour[3];
+    // strftime(timeHour, 3, "%H", &timeinfo);
+    // Serial.println(timeHour);
+    // char timeWeekDay[10];
+    // strftime(timeWeekDay, 10, "%A", &timeinfo);
+    // Serial.println(timeWeekDay);
+    Serial.println();
 }
 
 // MQTT Callback if we need to receive stuff
@@ -103,8 +163,6 @@ void connectWifi() {
         Serial.print("Connecting to ");
         Serial.println(ssid);
 
-        // WiFi.config(ip, gateway, subnet);
-
         WiFi.mode(WIFI_STA);
         WiFi.begin(ssid, password);
         WiFi.waitForConnectResult();
@@ -112,14 +170,15 @@ void connectWifi() {
         Serial.print("IP Address: ");
         Serial.println(WiFi.localIP());
 
-        // WiFi.config(ip, gateway, subnet);
-
         while (WiFi.status() != WL_CONNECTED) {
             delay(500);
             Serial.print(".");
         }
+
+        configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     }
 
+    printLocalTime();
     Serial.println("");
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
@@ -144,7 +203,10 @@ void reconnect() {
         // client.connect(dev_hash,mqtt_username,mqtt_password,mqtt_topic_lwt,0,true,lwt_message)
 
         if (mqtt_client.connect(mqtt_clientId.c_str(), mqtt_userName, mqtt_userPass, mqtt_topic_lwt.c_str(), 0, true, lwt_message)) {
+
             Serial.println("connected");
+
+            mqtt_client.setBufferSize(1024);
 
             //once connected to MQTT broker, subscribe to our command topic
             bool bSubscribed = false;
@@ -152,9 +214,13 @@ void reconnect() {
             while (!bSubscribed) {
                 bSubscribed = mqtt_client.subscribe(mqtt_topic_subscribe.c_str());
             }
-            mqtt_client.publish(mqtt_topic_lwt.c_str(), 'Online', true);
+
+            String lwtState = "Online";
+            mqtt_client.publish(mqtt_topic_lwt.c_str(), lwtState.c_str(), true);
+
             mqtt_client.setCallback(callback);
             mqtt_client.loop();
+
         } else {
             Serial.print("failed, rc=");
             Serial.print(mqtt_client.state());
@@ -174,12 +240,16 @@ void publish() {
         reconnect();
     }
 
-    mqtt_client.publish(mqtt_topic_attributes.c_str(), publish_data.c_str(), true);
-
-    Serial.print("Publishing : ");
-    Serial.println(publish_data.c_str());
-    Serial.print("to : ");
-    Serial.println(mqtt_topic_attributes.c_str());
+    if (mqtt_client.connected()) {
+        Serial.print(mqtt_topic_attributes.c_str());
+        Serial.print(":");
+        Serial.print(publish_data.c_str());
+        Serial.println("");
+        mqtt_client.publish(mqtt_topic_attributes.c_str(), publish_data.c_str(), true);
+    } else {
+        Serial.print("ERROR: No Connection to ");
+        Serial.println(mqtt_server);
+    }
 
     delay(2000);
 }
@@ -199,121 +269,12 @@ class MyAdvertisedDeviceCallbacks : public BLEAdvertisedDeviceCallbacks {
     }
 };
 
-void bodyScaleDevice(BLEAdvertisedDevice d) {
-    Serial.println("");
-    Serial.println("NEW DATA -----------------------------------------");
-    String hex;
-
-    if (d.haveServiceData()) {
-        std::string md = d.getServiceData();
-        uint8_t *mdp = (uint8_t *)d.getServiceData().data();
-        char *pHex = BLEUtils::buildHexData(nullptr, mdp, md.length());
-        hex = pHex;
-
-        Serial.print("\thex:");
-        Serial.println(hex);
-
-        Serial.print("\tphex:");
-        Serial.println(pHex);
-
-        Serial.print("\t22:");
-        Serial.println(stoi2(hex, 22));
-
-        free(pHex);
-
-        // Controlbyte:Substring : 07e4
-        Serial.print("\tControlbyte:");
-        Serial.println(stoi2(hex, 4));
-    }
-
-    // get the impedance
-    float impedance = stoi2(hex, 18);  // * 0.01f * 100;
-
-    if (unNoImpedanceCount < 3 && impedance == 0) {
-        unNextTime = millis() + (10 * unMillis);
-        unNoImpedanceCount++;
-        Serial.println("\tReading incomplete, reattempting");
-        return;
-    }
-
-    unNoImpedanceCount = 0;
-
-    // get the data
-    float measured = stoi2(hex, 22) * 0.01f;
-    float weight = stoi2(hex, 22) * 0.01f;
-    int user = stoi(hex, 6);
-    int units = stoi(hex, 0);
-
-    // decode the units and recalc the weight based on the unit
-    String strUnits;
-    if (units == 1) {
-        // Chinese Catty
-        strUnits = "jin";
-        weight = weight * 0.50 * 0.50;
-    } else if (units == 2) {
-        //  MKS kg
-        strUnits = "kg";
-        weight = weight * 0.50;
-    } else if (units == 3) {
-        // Imperial pound
-        weight = weight * 0.4536;
-        strUnits = "lbs";
-    }
-
-    String time = String(String(stoi2(hex, 4)) + "-" + String(stoi(hex, 8)) + "-" + String(stoi(hex, 10)) + " " + String(stoi(hex, 12)) + ":" + String(stoi(hex, 14)) + ":" + String(stoi(hex, 16)));
-
-    // Currently we just send the raw values over and let appdaemon figure out the rest...
-    if (weight > 0 and impedance > 0 and lastTimestamp != time) {
-        lastTimestamp = time;
-
-        publish_data = String("{\"weight\": ");
-        publish_data += String(weight);
-        publish_data += String(", \"measured\": ");
-        publish_data += String(measured);
-        publish_data += String(", \"impedance\": ");
-        publish_data += String(int(impedance));
-        publish_data += String(", \"units\":\"");
-        publish_data += String(strUnits);
-        publish_data += String("\", \"user\":\"");
-        publish_data += String(user);
-        publish_data += String("\", \"device\":\"");
-        publish_data += String(scale_mac_addr);
-        publish_data += String("\", \"version\":\"");
-        publish_data += String(appversion);
-        publish_data += String("\", \"timestamp\":\"");
-        publish_data += time;
-        publish_data += String("\"}");
-
-        // --------------------------------------------
-        // publish the scale data
-        // --------------------------------------------
-
-        // Payload: {
-        //            "weight": 70.50,
-        //            "measured": 141.00,
-        //            "impedance": 460,
-        //            "units":"kg",
-        //            "user":"7",
-        //            "device":"5c:ca:d3:4c:ee:74",
-        //            "version":"1.0.0",
-        //            "timestamp":"2020-9-24 17:17:6"
-        //           }
-        // to : tele/bodyscale/measurement/7
-
-        String tele_user = "/" + String(user);
-        mqtt_topic_attributes = String(mqtt_stat + base_topic + mqtt_attributes + tele_user);
-        publish();
-
-        // Got a reading, we can time out for a bit (5 minutes)
-        unNextTime = millis() + (5 * 60 * unMillis);
-    }
-}
-
 void ScanBLE() {
     // Scan often unless we find a reading
     unNextTime = millis() + (30 * unMillis);
 
     Serial.println("Starting BLE Scan");
+
     if (WiFi.status() == WL_CONNECTED) {
         Serial.println("Disconnecting From MQTT.");
         mqtt_client.disconnect();
@@ -337,13 +298,13 @@ void ScanBLE() {
     int count = foundDevices.getCount();
 
     for (int i = 0; i < count; i++) {
+
         BLEAdvertisedDevice d = foundDevices.getDevice(i);
 
         if (d.getAddress().toString() != scale_mac_addr)
             continue;
 
         Serial.println("");
-        Serial.println("NEW DATA -----------------------------------------");
         String hex;
 
         if (d.haveServiceData()) {
@@ -352,6 +313,10 @@ void ScanBLE() {
             char *pHex = BLEUtils::buildHexData(nullptr, mdp, md.length());
             hex = pHex;
 
+            setTimestamp();
+            Serial.println(" ");
+            Serial.print("Scanning for new data:");
+            Serial.println(timestamp);
             Serial.print("\thex:");
             Serial.println(hex);
 
@@ -364,12 +329,29 @@ void ScanBLE() {
             free(pHex);
 
             // Controlbyte:Substring : 07e4
+            int controlByte = stoi2(hex, 4);
             Serial.print("\tControlbyte:");
-            Serial.println(stoi2(hex, 4));
+            Serial.println(controlByte);
+            int isWeightRemoved = controlByte & (1 << 7);
+            bool isStabilized = controlByte & (1 << 5) != 0;
+            Serial.print("\tWeightRemoved:");
+            Serial.println(isWeightRemoved);
+            Serial.print("\tStabilized:");
+            Serial.println(isStabilized);
+            if (!isStabilized and isWeightRemoved) {
+                Serial.println("\tNot stabilized, skip and wait for the next one....");
+                // return;
+            }                
+            
+        }else{
+            return;
         }
 
         // get the impedance
         float impedance = stoi2(hex, 18);  // * 0.01f * 100;
+        int sequence =  stoi(hex, 8);
+        Serial.print("\tSequence: ");
+        Serial.println(sequence);
 
         if (unNoImpedanceCount < 3 && impedance == 0) {
             unNextTime = millis() + (10 * unMillis);
@@ -380,9 +362,9 @@ void ScanBLE() {
 
         unNoImpedanceCount = 0;
 
-        // get the data
+        // get the data weight, user and units
         float measured = stoi2(hex, 22) * 0.01f;
-        float weight = stoi2(hex, 22) * 0.01f;
+        float weight = measured;
         int user = stoi(hex, 6);
         int units = stoi(hex, 0);
 
@@ -402,55 +384,55 @@ void ScanBLE() {
             strUnits = "lbs";
         }
 
-        String time = String(String(stoi2(hex, 4)) + "-" + String(stoi(hex, 8)) + "-" + String(stoi(hex, 10)) + " " + String(stoi(hex, 12)) + ":" + String(stoi(hex, 14)) + ":" + String(stoi(hex, 16)));
+        char dt[32];
+        sprintf(dt, "%s-%02d-%02d %02d:%02d:%02d", String(stoi2(hex, 4)), stoi(hex, 8), stoi(hex, 10), stoi(hex, 12), stoi(hex, 14), stoi(hex, 16));
+        String scaleTime = String(dt);
 
-        // Currently we just send the raw values over and let appdaemon figure out the rest...
-        if (weight > 0 and impedance > 0 and lastTimestamp != time) {
-            lastTimestamp = time;
+        Serial.print("\tLastTimestamp:");
+        Serial.println(lastTimestamp);
 
+        Serial.print("\tScaleTime:");
+        Serial.println(scaleTime);
+
+        // Currently we just send the raw values over and mqqt service figure out the rest...
+        if (weight > 0 and impedance > 0 and lastTimestamp != scaleTime) {
+            // publish only if we have new weight, impedance and a new scan
+            setTimestamp();
             publish_data = String("{\"measured\": ");
             publish_data += String(weight);
             publish_data += String(", \"calcweight\": ");
             publish_data += String(measured);
             publish_data += String(", \"impedance\": ");
             publish_data += String(int(impedance));
-            publish_data += String(", \"units\":\"");
+            publish_data += String(", \"unit\":\"");
             publish_data += String(strUnits);
             publish_data += String("\", \"user\":\"");
             publish_data += String(user);
-            publish_data += String("\", \"device\":\"");
+            publish_data += String("\", \"id\":\"");
             publish_data += String(scale_mac_addr);
             publish_data += String("\", \"version\":\"");
             publish_data += String(appversion);
             publish_data += String("\", \"timestamp\":\"");
-            publish_data += time;
+            publish_data += timestamp;
+            publish_data += String("\", \"lastscan\":\"");
+            publish_data += lastTimestamp;
             publish_data += String("\", \"scantime\":\"");
-            publish_data += time;
+            publish_data += scaleTime;
             publish_data += String("\"}");
 
             // --------------------------------------------
             // publish the scale data
             // --------------------------------------------
+            lastTimestamp = String(scaleTime);
 
-            // Payload: {
-            //            "weight": 70.50,
-            //            "measured": 141.00,
-            //            "impedance": 460,
-            //            "units":"kg",
-            //            "user":"7",
-            //            "device":"5c:ca:d3:4c:ee:74",
-            //            "version":"1.0.0",
-            //            "timestamp":"2020-9-24 17:17:6"
-            //           }
-            // to : tele/bodyscale/measurement/7
-
-            String tele_user = "/" + String(user);
-            mqtt_topic_attributes = String(mqtt_stat + base_topic + mqtt_attributes + tele_user);
+            Serial.print("\tPublishing Data:");
+            Serial.println(timestamp);
             publish();
-
-            // Got a reading, we can time out for a bit (5 minutes)
-            unNextTime = millis() + (5 * 60 * unMillis);
+            Serial.println(" ");
+            
         }
+        // Got a reading, we can time out for a bit (... minutes)
+        unNextTime = millis() + (60 * unMillis);
     }
     Serial.println("Finished BLE Scan");
 }
