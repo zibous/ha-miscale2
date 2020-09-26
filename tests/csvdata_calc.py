@@ -8,11 +8,14 @@ try:
     import csv
     from datetime import datetime
     from lib import calcdata
+    from conf import *
+    from lib import logger
 
 except Exception as e:
-    print('Import error {}, check requirements.txt'.format(e))
+    print(f"Import error: {str(e)} line {sys.exc_info()[-1].tb_lineno}, check requirements.txt")
     sys.exit(1)
 
+log = logger.Log("csvtestcase", MI2_SHORTNAME, 10)
 
 def doCalc(scaledata, data) -> dict:
 
@@ -94,7 +97,7 @@ def testcase1():
     for data in dict_list:
         # simulate the impedance from the history values
         # impedance = int((450 / 54) * float(data['wasser']))
-        impedance = int((175**2) / float(data['wasser'])
+        impedance = int((175**2) / float(data['wasser']))
         scaledata = {
             "measured": float(data['gewicht']),
             "calcweight": 70.65,
@@ -105,7 +108,7 @@ def testcase1():
         }
         mCalc = calcdata.CalcData(scaledata, True)
         user = mCalc.getUserData()
-        mCalc.impedance = (int(user['height'])**2) / float(data['wasser'])
+        mCalc.impedance = int( (user['height']**2) / float(data['wasser']))
 
         # get the data from the calculation
         results = mCalc.getData('full', 'data')
@@ -116,6 +119,51 @@ def testcase1():
     print(f'Processed {line_count} lines.')
     return line_count
 
+def updateInfluxDb():
+
+    log.debug("Start Update Influxdb data")
+    
+    variables_file = '../data/peter.csv'
+    reader = csv.DictReader(open(variables_file, 'r'), delimiter=',')
+    dict_list = []
+    for line in reader:
+        dict_list.append(line)
+
+    line_count = 0
+    
+    for data in dict_list:
+
+        # recalc the impedance and build the measurement data
+        scaledata = {
+            "measured": float(data['gewicht']),
+            "calcweight": float(data['gewicht']),
+            "unit": 'kg',
+            "impedance": data['impedance'],
+            "timestamp": data['datum'] + " " + data['zeit'],
+            "scantime": data['datum'] + " " + data['zeit']
+        }
+
+        log.info("Scale data: {}".format(scaledata))  
+        # start the calculation modul
+        mCalc = calcdata.CalcData(scaledata, True)
+
+        # get the userdata
+        user = mCalc.getUserData()
+       
+        # get the data from the calculation
+        # results = mCalc.getData('full', 'data')
+
+        # publish data to the influxDB
+        log.info("Update row{}, User{}".format(line_count, user['name']))
+        datasections = {"influxdb": True}
+        mCalc.publishdata(datasections)
+
+        line_count += 1
+
+    print(f'Processed {line_count} records to influxDB.')
+    return line_count
+
 
 # calcRecalibrate()
-testcase1()
+# testcase1()
+updateInfluxDb()

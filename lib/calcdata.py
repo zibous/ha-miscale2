@@ -475,7 +475,7 @@ class CalcData():
                     if field in self.data:
                         ifx_flields[field] = self.data[field]
                 if ifx_flields:
-                    log.debug("Publish to INFLUXDB: {}, Time:{}, fields:{}".format(measurement, self.data['timestamp'], ifx_flields))
+                    log.info("Publish to INFLUXDB: {}, Time:{}, fields:{}".format(measurement, self.data['timestamp'], ifx_flields))
                     ifx.post(ifx_flields,measurement,self.data['timestamp'])
                     return True
 
