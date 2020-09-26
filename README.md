@@ -214,7 +214,9 @@ The calculation results are saved once as a history in the data folder, publishe
 - https://support.withings.com/hc/en-us/articles/218500778-Body-What-are-the-normal-ranges-for-body-composition-<br>
 - https://googlechrome.github.io/samples/web-bluetooth/scan.html<br>
 - https://github.com/IanHarvey/bluepy/blob/master/docs/scanner.rst<br>
-
+- https://passionhome.sg/xiaomi-mi-body-composition-scale-v2-tips-and-instructions/ <br>
+- https://github.com/rando-calrissian/esp32_xiaomi_mi_2_hass<br>
+- https://github.com/limhenry/web-bluetooth-mi-scale<br>
 
 # Omron, Medisana, Xiaomi
 - https://www.amazon.de/Omron-HBF-511B-E-Ganzkörperanalyse-Waage-BF511-blau/dp/B0033AGBW0<br>
