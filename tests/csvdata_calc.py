@@ -17,6 +17,7 @@ except Exception as e:
 
 log = logger.Log("csvtestcase", MI2_SHORTNAME, 10)
 
+
 def doCalc(scaledata, data) -> dict:
 
     mCalc = calcdata.CalcData(scaledata, True)
@@ -41,8 +42,10 @@ def doCalc(scaledata, data) -> dict:
     result['check'] = round(float(result['fat']) + float(result['bone']) + float(result['muscle']) + float(result['water']), 2)
     return result
 
-def round_to_value(number,roundto:float=0.5):
+
+def round_to_value(number, roundto: float = 0.5):
     return (round(float(number) / roundto) * roundto)
+
 
 def calcRecalibrate():
     variables_file = '../data/gewichtsdaten.csv'
@@ -108,21 +111,42 @@ def testcase1():
         }
         mCalc = calcdata.CalcData(scaledata, True)
         user = mCalc.getUserData()
-        mCalc.impedance = int( (user['height']**2) / float(data['wasser']))
+        mCalc.impedance = int((user['height']**2) / float(data['wasser']))
 
         # get the data from the calculation
         results = mCalc.getData('full', 'data')
 
-        print('BMI', results['bmi'], "Weight", results['weight'], 'Fat', results['fat'], 'Bones:', results['bone'], 'Water', results['water'], 'Muscle', results['muscle'], 'Visceral', results['visceral'])
+        log.info("Results: {}".format(results))
         line_count += 1
 
     print(f'Processed {line_count} lines.')
     return line_count
 
+
+def checkData():
+    
+    scaledata = {
+        "measured": 68.50,
+        "calcweight": 70.65,
+        "unit": 'kg',
+        "impedance": 543,
+        "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
+        "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
+    }
+
+    log.info("Calcdata: {}".format(scaledata))
+    mCalc = calcdata.CalcData(scaledata, True)
+    user = mCalc.getUserData()
+    
+    # get the data from the calculation
+    results = mCalc.getData('full', 'data')
+    log.info("Results: {}".format(results))
+    mCalc.__savedata__()
+
 def updateInfluxDb():
 
     log.debug("Start Update Influxdb data")
-    
+
     variables_file = '../data/peter.csv'
     reader = csv.DictReader(open(variables_file, 'r'), delimiter=',')
     dict_list = []
@@ -130,7 +154,7 @@ def updateInfluxDb():
         dict_list.append(line)
 
     line_count = 0
-    
+
     for data in dict_list:
 
         # recalc the impedance and build the measurement data
@@ -143,20 +167,21 @@ def updateInfluxDb():
             "scantime": data['datum'] + " " + data['zeit']
         }
 
-        log.info("Scale data: {}".format(scaledata))  
+        log.info("Scale data: {}".format(scaledata))
+
         # start the calculation modul
         mCalc = calcdata.CalcData(scaledata, True)
 
         # get the userdata
         user = mCalc.getUserData()
-       
-        # get the data from the calculation
-        # results = mCalc.getData('full', 'data')
 
-        # publish data to the influxDB
-        log.info("Update row{}, User{}".format(line_count, user['name']))
-        datasections = {"influxdb": True}
-        mCalc.publishdata(datasections)
+        # make the calulations
+        if mCalc.doCalc('full'):
+
+            # publish data to the influxDB
+            log.info("Update row{}, User{}".format(line_count, user['name']))
+            mCalc.publish2Influxdb()
+            mCalc.bodyScores2Influxdb()
 
         line_count += 1
 
@@ -167,3 +192,4 @@ def updateInfluxDb():
 # calcRecalibrate()
 # testcase1()
 updateInfluxDb()
+# checkData()

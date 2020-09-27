@@ -28,14 +28,14 @@ log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
 
 class CalcData():
 
-    version = '1.0.0'
+    version = '1.0.1'
 
     def __init__(self, data: dict = None, useAgeCalc: bool = True):
         self.useAgeCalc = useAgeCalc
         # current user settings
         self.user = 'default'
         self.dob = None
-        self.height = 178
+        self.height = 175
         self.age = 18
         self.sex = 'male'
         self.athletic = False
@@ -51,14 +51,34 @@ class CalcData():
         self.bodyscores = {}
         if self.data and "measured" in self.data and "impedance" in self.data:
             self.weight = float(self.data["measured"])
+            self.data['weight'] = self.weight
             self.impedance = int(self.data["impedance"])
             if "unit" in self.data:
                 self.unit = self.data["unit"]
             if "timestamp" in self.data:
                 self.timestamp = self.data["timestamp"]
             self.__setUserData__()
-            self.ready = True
-        
+            # check valid data
+            self.ready = self.__checkdata__()
+
+    def setData(self, name, value):
+        self.data[name] = value
+
+    def doCalc(self, mode: str = 'simple'):
+        try:
+            if self.ready:
+                if mode == 'simple':
+                    self.__setSimpledata__()
+                elif mode == 'userdata':
+                    self.getUserData()
+                else:
+                    self.__setBodyMetricsdata__()
+                return True
+            else:
+                return False
+        except BaseException as e:
+            log.error(f"Error {__name__}, {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+            pass
 
     def getData(self, mode: str = 'simple', dataformat: str = 'debug'):
         try:
@@ -80,26 +100,27 @@ class CalcData():
 
     def getUserData(self) -> dict:
         try:
-            return {
-                "userid": self.userid,
-                "name": self.user,
-                "dob": self.dob,
-                "height": self.height,
-                "age": self.age,
-                "sex": self.sex,
-                "male": (self.sex == 'male') * 1,
-                "athletic": self.athletic,
-                "targetweight": self.userscores['WEIGHT'],
-                "adjustments": self.adjustments,
-                "scaledata": {
-                    "weight": self.weight,
-                    "unit": self.unit,
-                    "impedance": self.impedance,
-                    "timestamp": self.timestamp,
-                },
-                "ready": self.ready,
-                "appversion": self.version
-            }
+            if self.ready:
+                return {
+                    "userid": self.userid,
+                    "name": self.user,
+                    "dob": self.dob,
+                    "height": self.height,
+                    "age": self.age,
+                    "sex": self.sex,
+                    "male": (self.sex == 'male') * 1,
+                    "athletic": self.athletic,
+                    "targetweight": self.userscores['WEIGHT'],
+                    "adjustments": self.adjustments,
+                    "scaledata": {
+                        "weight": self.weight,
+                        "unit": self.unit,
+                        "impedance": self.impedance,
+                        "timestamp": self.timestamp,
+                    },
+                    "ready": self.ready,
+                    "appversion": self.version
+                }
         except BaseException as e:
             log.error(f"Error {__name__}, {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             return None
@@ -116,7 +137,7 @@ class CalcData():
                     cf = self.adjustments[idx]
                     self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
                     #self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
-                    self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
+                    #self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
                     self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
                     # self.data['muscle'] = round(float(self.data['muscle'])*float(cf['muscle']),2)
                 else:
@@ -281,7 +302,7 @@ class CalcData():
             log.debug("User data loaded  for {}".format(self.user))
 
     def __calcdatadiff__(self) -> dict:
-        if self.data:
+        if self.data and self.ready:
             file_path = "{}miscale-{}.json".format(DATA_DIR, self.user)
             try:
                 if os.path.isfile(file_path):
@@ -307,7 +328,7 @@ class CalcData():
         return None
 
     def __savedata__(self):
-        if self.data:
+        if self.data and self.ready:
             # first save the current data
             file_path = "{}miscale-{}.json".format(DATA_DIR, self.user)
             with open(file_path, 'w') as f:
@@ -333,23 +354,40 @@ class CalcData():
                 log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
                 pass
 
+    def __checkdata__(self):
+        fields = [
+            "weight",
+            "unit",
+            "impedance",
+            "timestamp"
+        ]
+        valid = True
+        for field in fields:
+            if(not field in self.data):
+                valid = False
+                log.error("Error {}: Datafield {} is missing".format(__name__, field))
+                break
+
+        return valid
+
     def __setSimpledata__(self):
         try:
-            self.simpledata['user'] = self.user
-            self.simpledata['sex'] = self.sex
-            self.simpledata['athletic'] = self.athletic
-            self.simpledata['age'] = round(self.age, 2)
-            self.simpledata['weight'] = round(self.weight, 2)
-            self.simpledata['unit'] = self.unit
-            self.simpledata['impedance'] = self.impedance
-            # simple caclulation for the water, fat.....
-            self.simpledata['bmi'] = round((self.weight / (self.height ** 2)) * 10000, 2)
-            self.simpledata['water'] = round(0.72 * (-1.976 + 0.907 * self.weight), 2)
-            self.simpledata['fat'] = round((1.281 * self.simpledata['bmi']) - 10.13, 2)
-            self.simpledata['timestamp'] = self.timestamp
-            self.simpledata['version'] = self.version
-            self.simpledata["icon"] = "mdi:scale-bathroom"
-            self.simpledata['attribution'] = ATTRIBUTION
+            if self.ready:
+                self.simpledata['user'] = self.user
+                self.simpledata['sex'] = self.sex
+                self.simpledata['athletic'] = self.athletic
+                self.simpledata['age'] = round(self.age, 2)
+                self.simpledata['weight'] = round(self.weight, 2)
+                self.simpledata['unit'] = self.unit
+                self.simpledata['impedance'] = self.impedance
+                # simple caclulation for the water, fat.....
+                self.simpledata['bmi'] = round((self.weight / (self.height ** 2)) * 10000, 2)
+                self.simpledata['water'] = round(0.72 * (-1.976 + 0.907 * self.weight), 2)
+                self.simpledata['fat'] = round((1.281 * self.simpledata['bmi']) - 10.13, 2)
+                self.simpledata['timestamp'] = self.timestamp
+                self.simpledata['version'] = self.version
+                self.simpledata["icon"] = "mdi:scale-bathroom"
+                self.simpledata['attribution'] = ATTRIBUTION
         except Exception as e:
             log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
             pass
@@ -359,57 +397,57 @@ class CalcData():
             if self.data and 'bmr' in self.data:
                 # allready calculated
                 return True
+            if self.ready:
+                log.debug("Set Body Metrics data for {}, Weight:{}".format(self.user, self.weight))
+                # Körperfettanteil + Knochenmasse + Muskelmasse = 100 % der Körperzusammensetzung
+                lib = body_metrics.bodyMetrics(self.weight, self.height, self.age, self.impedance, self.sex)
 
-            log.debug("Set Body Metrics data for {}, Weight:{}".format(self.user, self.weight))
-            # Körperfettanteil + Knochenmasse + Muskelmasse = 100 % der Körperzusammensetzung
-            lib = body_metrics.bodyMetrics(self.weight, self.height, self.age, self.impedance, self.sex)
+                # user data
+                self.data['user'] = self.user
+                self.data['sex'] = self.sex
+                self.data['athletic'] = self.athletic
+                self.data['age'] = round(self.age, 2)
+                self.data['metabolic_age'] = round(lib.getMetabolicAge(), 2)
+                self.data['impedance'] = self.impedance
+                self.data['bmi'] = round(lib.getBMI(), 2)
+                self.data['poi'] = self.getPonderalIndex()
+                self.data['bodytype'] = BODY_SCALE_TPYES[lib.getBodyType()]
 
-            # user data
-            self.data['user'] = self.user
-            self.data['sex'] = self.sex
-            self.data['athletic'] = self.athletic
-            self.data['age'] = round(self.age, 2)
-            self.data['metabolic_age'] = round(lib.getMetabolicAge(), 2)
-            self.data['impedance'] = self.impedance
-            self.data['bmi'] = round(lib.getBMI(), 2)
-            self.data['poi'] = self.getPonderalIndex()
-            self.data['bodytype'] = BODY_SCALE_TPYES[lib.getBodyType()]
+                # weight
+                self.data['weight'] = round(self.weight, 2)
+                self.data['idealweight'] = round(lib.getIdealWeight(), 2)
+                self.data['targetweight'] = self.userscores['WEIGHT']
+                self.data['unit'] = self.unit
 
-            # weight
-            self.data['weight'] = round(self.weight, 2)
-            self.data['idealweight'] = round(lib.getIdealWeight(), 2)
-            self.data['targetweight'] = self.userscores['WEIGHT']
-            self.data['unit'] = self.unit
+                # fat
+                self.data['lbm'] = round(lib.getLBMCoefficient(), 2)
+                self.data['fat'] = round(lib.getFatPercentage(), 2)
+                self.data['fattype'] = lib.getFatMassToIdeal()['type']
+                # not a valid data from getFatMassToIdeal, use usersettings instead
+                if self.userscores and self.userscores['FAT']:
+                    self.data['idealfat'] = self.userscores['FAT']
+                else:
+                    self.data['idealfat'] = round(lib.getFatMassToIdeal()['mass'], 2)
+                self.data['visceral'] = round(lib.getVisceralFat(), 2)
 
-            # fat
-            self.data['lbm'] = round(lib.getLBMCoefficient(), 2)
-            self.data['fat'] = round(lib.getFatPercentage(), 2)
-            self.data['fattype'] = lib.getFatMassToIdeal()['type']
-            # not a valid data from getFatMassToIdeal, use usersettings instead
-            if self.userscores and self.userscores['FAT']:
-                self.data['idealfat'] = self.userscores['FAT']
-            else:
-                self.data['idealfat'] = round(lib.getFatMassToIdeal()['mass'], 2)
-            self.data['visceral'] = round(lib.getVisceralFat(), 2)
+                # water, bone, muscle, protein
+                self.data['water'] = round(lib.getWaterPercentage(), 2)
+                self.data['bone'] = round(lib.getBoneMass(), 2)
+                self.data['muscle'] = round(lib.getMuscleMass(), 2)
 
-            # water, bone, muscle, protein
-            self.data['water'] = round(lib.getWaterPercentage(), 2)
-            self.data['bone'] = round(lib.getBoneMass(), 2)
-            self.data['muscle'] = round(lib.getMuscleMass(), 2)
+                self.data['ffm'] = self.getFatfreemass()
+                self.data['ffmi'] = self.getFatfreemassIndex()
+                self.data['protein'] = round(lib.getProteinPercentage(), 2)
+                self.data['bmr'] = round(lib.getBMR(), 0)
+                self.data['timestamp'] = self.timestamp
+                self.data['version'] = self.version
 
-            self.data['ffm'] = self.getFatfreemass()
-            self.data['ffmi'] = self.getFatfreemassIndex()
-            self.data['protein'] = round(lib.getProteinPercentage(), 2)
-            self.data['bmr'] = round(lib.getBMR(), 0)
-            self.data['timestamp'] = self.timestamp
-            self.data['version'] = self.version
+                self.__recalibrate__()
 
-            self.__recalibrate__()
+                if self.userscores:
+                    self.setBodyScores()
 
-            if self.userscores:
-                self.setBodyScores()
-
-            return True
+                return True
 
         except Exception as e:
             log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
@@ -417,7 +455,7 @@ class CalcData():
 
     def setBodyScores(self):
         try:
-            if self.userscores:
+            if self.userscores and self.ready:
                 score = body_score.bodyScore(self.age,
                                              self.sex,
                                              self.height,
@@ -465,18 +503,53 @@ class CalcData():
             log.error(f"Error {__name__}: {str(e)},  line {sys.exc_info()[-1].tb_lineno}")
             pass
 
-    def publish2Influxdb(self):
-        if self.data and INFLUXDB_MEASUREMENT and IFLUXDB_DATALIST:
+    def bodyScores2Influxdb(self):
+        if not self.ready:
+            return False
+        if self.bodyscores and INFLUXDB_MEASUREMENT:
             try:
-                measurement = INFLUXDB_MEASUREMENT + self.user.lower()
+                measurement = "{}{}{}".format(INFLUXDB_MEASUREMENT, self.user.lower(), '_scores')
                 ifx = influxdata.InfuxdbCient()
                 ifx_flields = {}
-                for field in IFLUXDB_DATALIST:
-                    if field in self.data:
-                        ifx_flields[field] = self.data[field]
+                ifx_flields['score'] = self.bodyscores['score']
+                ifx_flields['weight'] = self.bodyscores['deltas']['weight']
+                ifx_flields['fat'] = self.bodyscores['deltas']['fat']
+                ifx_flields['water'] = self.bodyscores['deltas']['water']
+                ifx_flields['muscle'] = self.bodyscores['deltas']['muscle']
+                ifx_flields['visceral'] = self.bodyscores['deltas']['visceral']
+                ifx_flields['protein'] = self.bodyscores['deltas']['protein']
+                ifx_flields['energie'] = self.bodyscores['engergieexp']
+                ifx_flields['macro_prot'] = self.bodyscores['macronut']['protein']
+                ifx_flields['macro_kh'] = self.bodyscores['macronut']['carbohydrates']
+                ifx_flields['macro_fat'] = self.bodyscores['macronut']['fat']
                 if ifx_flields:
                     log.info("Publish to INFLUXDB: {}, Time:{}, fields:{}".format(measurement, self.data['timestamp'], ifx_flields))
-                    ifx.post(ifx_flields,measurement,self.data['timestamp'])
+                    ifx.post(ifx_flields, measurement, self.data['timestamp'])
+                    return True
+
+            except BaseException as e:
+                log.error(f"Error {__name__}, Tag: {INFLUXDB_MEASUREMENT + self.user.lower()} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
+                pass
+
+    def publish2Influxdb(self):
+
+        if not self.ready:
+            return False
+
+        if self.data and INFLUXDB_MEASUREMENT:
+            try:
+                measurement = "{}{}".format(INFLUXDB_MEASUREMENT , self.user.lower())
+                ifx = influxdata.InfuxdbCient()
+                if IFLUXDB_DATALIST:
+                    ifx_flields = {}
+                    for field in IFLUXDB_DATALIST:
+                        if field in self.data:
+                            ifx_flields[field] = self.data[field]
+                else:
+                    ifx_flields = self.data
+                if ifx_flields:
+                    log.info("Publish to INFLUXDB: {}, Time:{}, fields:{}".format(measurement, self.data['timestamp'], ifx_flields))
+                    ifx.post(ifx_flields, measurement, self.data['timestamp'])
                     return True
 
             except BaseException as e:
@@ -484,6 +557,10 @@ class CalcData():
                 pass
 
     def publishdata(self, datasections: dict = None):
+
+        if not self.ready:
+            return False
+
         try:
             if not datasections:
                 # default
@@ -525,12 +602,16 @@ class CalcData():
             if "influxdb" in datasections and INFLUXDB_HOST:
                 # publish data to influxdb
                 self.publish2Influxdb()
+                self.bodyScores2Influxdb()
+            return True
 
         except BaseException as e:
             log.error(f"Error {__name__}, Data for: {self.user}, Error: {str(e)} line {sys.exc_info()[-1].tb_lineno}")
             pass
 
     def __publishdata__(self, topic: str = MQTT_PREFIX, data: dict = None):
+        if not self.ready:
+            return False
         if MQTT_HOST and MQTT_PREFIX and data:
             try:
                 if data and topic:
@@ -538,8 +619,10 @@ class CalcData():
                     mqtt_client = mqtt.client()
                     if mqtt_client.ready:
                         mqtt_client.publish(topic, data, True)
+                        return True
                 else:
                     log.error()("MQTT publish failed, not data present!")
+                    return False
             except BaseException as e:
                 log.error(f"Error {__name__}, topic: {topic} {str(e)} line {sys.exc_info()[-1].tb_lineno}")
                 pass

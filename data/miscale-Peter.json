@@ -1,1 +1,1 @@
-
+{"measured": 68.5, "calcweight": 70.65, "unit": "kg", "impedance": 543, "timestamp": "2020-09-27 08:39:22", "scantime": "2020-09-27 08:39:22", "weight": 68.5, "user": "Peter", "sex": "male", "athletic": true, "age": 64.83, "metabolic_age": 41.43, "bmi": 22.37, "poi": 12.78, "bodytype": "Ausgeglichen", "idealweight": 66.5, "targetweight": 70.0, "lbm": 54.68, "fat": 12.01, "fattype": "to_gain", "idealfat": 11.5, "visceral": 6.2, "water": 53.96, "bone": 3.56, "muscle": 51.14, "ffm": 54.19, "ffmi": 17.69, "protein": 20.7, "bmr": 1191.0, "version": "1.0.1", "tdee": 2501}
