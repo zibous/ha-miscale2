@@ -25,7 +25,6 @@ except Exception as e:
 
 log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
 
-
 class CalcData():
 
     version = '1.0.1'
@@ -57,6 +56,8 @@ class CalcData():
                 self.unit = self.data["unit"]
             if "timestamp" in self.data:
                 self.timestamp = self.data["timestamp"]
+            else:
+                self.data["timestamp"] = self.timestamp
             self.__setUserData__()
             # check valid data
             self.ready = self.__checkdata__()
@@ -130,16 +131,16 @@ class CalcData():
 
     def __recalibrate__(self):
         try:
-            if self.adjustments and self.athletic:
-                idx = self.round_to_value(self.weight)
+            if self.adjustments and self.athletic:                
+                idx = str(self.round_to_value(self.weight))                
                 if idx in self.adjustments:
-                    log.debug('Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
+                    log.debug(' *** Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
                     cf = self.adjustments[idx]
                     self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
                     #self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
-                    #self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
+                    self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
                     self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
-                    # self.data['muscle'] = round(float(self.data['muscle'])*float(cf['muscle']),2)
+                    self.data['muscle'] = round(float(self.data['muscle'])*float(cf['muscle']),2)
                 else:
                     log.debug('No calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
         except BaseException as e:
@@ -394,9 +395,11 @@ class CalcData():
 
     def __setBodyMetricsdata__(self) -> dict():
         try:
+
             if self.data and 'bmr' in self.data:
                 # allready calculated
                 return True
+
             if self.ready:
                 log.debug("Set Body Metrics data for {}, Weight:{}".format(self.user, self.weight))
                 # Körperfettanteil + Knochenmasse + Muskelmasse = 100 % der Körperzusammensetzung
@@ -538,7 +541,7 @@ class CalcData():
 
         if self.data and INFLUXDB_MEASUREMENT:
             try:
-                measurement = "{}{}".format(INFLUXDB_MEASUREMENT , self.user.lower())
+                measurement = "{}{}".format(INFLUXDB_MEASUREMENT, self.user.lower())
                 ifx = influxdata.InfuxdbCient()
                 if IFLUXDB_DATALIST:
                     ifx_flields = {}
