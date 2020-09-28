@@ -152,7 +152,7 @@ def checkdata():
         pass
 
 
-def plotCompare(results: list = None, title: str = "Xiami vs. VitaDock", output: str = "result.png"):
+def plotCompare(results: list = None, title: str = "Xiami vs. VitaDock", output: str = "scalefactors_result.png"):
 
     try:
         variables_file = '../data/peter.csv'
@@ -160,6 +160,7 @@ def plotCompare(results: list = None, title: str = "Xiami vs. VitaDock", output:
         scaledata = dict()
         d1 = dict()
         d2 = dict()
+        d3 = dict()
 
         plotdata = list()
 
@@ -198,9 +199,19 @@ def plotCompare(results: list = None, title: str = "Xiami vs. VitaDock", output:
                 "muscle": float(d1['muscle']) - float(results['muscle']),
                 "bmi": float(d1['bmi']) - float(results['bmi'])
             }
+            
+            d3[float(d1['weight'])] = {
+                "bone": float(d1['bone']) / float(results['bone']),
+                "fat": float(d1['fat']) / float(results['fat']),
+                "water": float(d1['water']) / float(results['water']),
+                "muscle": float(d1['muscle']) / float(results['muscle'])
+            }
 
             plotdata.append(d2)
 
+        with open("../data/d3.json", "w") as outfile:
+                json.dump(d3, outfile)
+                
         data = dict()
         data['bmi'] = dict()
         data['fat'] = dict()        
@@ -230,8 +241,8 @@ def plotCompare(results: list = None, title: str = "Xiami vs. VitaDock", output:
         ax.grid(b=True, which='minor', color='#999999', linestyle='-', alpha=0.1)
 
         # primary y:
-        ax.plot(*zip(*sorted(data['bmi'].items())), label='BMI', color="gray")              ## result o.k
-        ax.plot(*zip(*sorted(data['bone'].items())), label='5-bone', color="lime")          ## result o.k
+        # ax.plot(*zip(*sorted(data['bmi'].items())), label='BMI', color="gray")              ## result o.k
+        # ax.plot(*zip(*sorted(data['bone'].items())), label='5-bone', color="lime")          ## result o.k
 
         ax.plot(*zip(*sorted(data['fat'].items())), label='fat', color="red")
         ax.plot(*zip(*sorted(data['muscle'].items())), label='muscle', color="green")
@@ -243,6 +254,9 @@ def plotCompare(results: list = None, title: str = "Xiami vs. VitaDock", output:
         ax.legend(lines_1, labels_1)
 
         plt.savefig(output, dpi=600)
+
+        with open("../data/factors.json", "w") as outfile:
+                json.dump(d3, outfile)
 
     except Exception as e:
         print(f"Checkdata error: {str(e)} line {sys.exc_info()[-1].tb_lineno}")

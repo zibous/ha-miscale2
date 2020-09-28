@@ -132,7 +132,8 @@ class CalcData():
     def __recalibrate__(self):
         try:
             if self.adjustments and self.athletic:                
-                idx = str(self.round_to_value(self.weight))                
+                ## idx = str(self.round_to_value(self.weight))  
+                idx = str(round(self.weight,1))              
                 if idx in self.adjustments:
                     log.debug(' *** Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
                     cf = self.adjustments[idx]
