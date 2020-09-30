@@ -306,6 +306,10 @@ USER3_ADJUSTMENTS = None
 BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data/')
 
-BODY_SCALE_TPYES = [
+BODY_SCALE_TYPES = [
     "Fettleibig", "Übergewichtig", "Dick", "Bewegungsmangel", "Ausgeglichen", "Ausgeglichen Muskulös", "Dünn", "Ausgeglichen Dünn", "Dünn Muskulös",
+]
+
+DIFF_TEXT_DE = [
+    "Abgenommen", "Keine Veränderung", "Zugenommen"
 ]

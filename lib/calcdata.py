@@ -25,6 +25,7 @@ except Exception as e:
 
 log = logger.Log(__name__, MI2_SHORTNAME, LOG_LEVEL)
 
+
 class CalcData():
 
     version = '1.0.1'
@@ -131,17 +132,17 @@ class CalcData():
 
     def __recalibrate__(self):
         try:
-            if self.adjustments and self.athletic:                
-                ## idx = str(self.round_to_value(self.weight))  
-                idx = str(round(self.weight,1))              
+            if self.adjustments and self.athletic:
+                # idx = str(self.round_to_value(self.weight))
+                idx = str(round(self.weight, 1))
                 if idx in self.adjustments:
                     log.debug(' *** Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
                     cf = self.adjustments[idx]
                     self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
-                    #self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
+                    # self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
                     self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
                     self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
-                    self.data['muscle'] = round(float(self.data['muscle'])*float(cf['muscle']),2)
+                    self.data['muscle'] = round(float(self.data['muscle']) * float(cf['muscle']), 2)
                 else:
                     log.debug('No calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
         except BaseException as e:
@@ -303,6 +304,16 @@ class CalcData():
 
             log.debug("User data loaded  for {}".format(self.user))
 
+    def __divval__(self, v1: float = 0.00, v2: float = 0.00) -> str:
+        idx = 1
+        if v1 < v2:
+            idx = 0
+        if v1 == v2:
+            idx = 1
+        if v1 > v2:
+            idx = 2
+        return DIFF_TEXT_DE[idx]
+
     def __calcdatadiff__(self) -> dict:
         if self.data and self.ready:
             file_path = "{}miscale-{}.json".format(DATA_DIR, self.user)
@@ -316,12 +327,20 @@ class CalcData():
                         if data_prev:
                             result = dict()
                             result['user'] = self.user
+                            # values to the previous data
                             result['weight'] = round(self.data['weight'] - data_prev['weight'], 2)
                             result['fat'] = round(self.data['fat'] - data_prev['fat'], 2)
                             result['water'] = round(self.data['water'] - data_prev['water'], 2)
                             result['muscle'] = round(self.data['muscle'] - data_prev['muscle'], 2)
                             result['visceral'] = round(self.data['visceral'] - data_prev['visceral'], 2)
                             result['protein'] = round(self.data['protein'] - data_prev['protein'], 2)
+                            if DIFF_TEXT_DE:
+                                # 0:lower, 1: equal, 2: greater
+                                result['wstate'] = self.__divval__(self.data['weight'], data_prev['weight'])
+                                result['fstate'] = self.__divval__(self.data['fat'], data_prev['fat'])
+                                result['mstate'] = self.__divval__(self.data['muscle'], data_prev['muscle'])
+                                result['vstate'] = self.__divval__(self.data['visceral'], data_prev['visceral'])
+                                result['pstate'] = self.__divval__(self.data['protein'], data_prev['protein'])
                             return result
             except BaseException as e:
                 log.error(f"Error Read previous file {file_path}, {str(e)} line {sys.exc_info()[-1].tb_lineno}")
@@ -415,7 +434,7 @@ class CalcData():
                 self.data['impedance'] = self.impedance
                 self.data['bmi'] = round(lib.getBMI(), 2)
                 self.data['poi'] = self.getPonderalIndex()
-                self.data['bodytype'] = BODY_SCALE_TPYES[lib.getBodyType()]
+                self.data['bodytype'] = BODY_SCALE_TYPES[lib.getBodyType()]
 
                 # weight
                 self.data['weight'] = round(self.weight, 2)
@@ -485,6 +504,13 @@ class CalcData():
                     self.bodyscores['deltas']['muscle'] = result['muscle']
                     self.bodyscores['deltas']['visceral'] = result['visceral']
                     self.bodyscores['deltas']['protein'] = result['protein']
+                    if DIFF_TEXT_DE:
+                        self.bodyscores['states'] = {}
+                        self.bodyscores['states']['weight'] = result['wstate']
+                        self.bodyscores['states']['fat'] = result['fstate']
+                        self.bodyscores['states']['water'] = result['mstate']
+                        self.bodyscores['states']['muscle'] = result['vstate']
+                        self.bodyscores['states']['protein'] = result['pstate']
                 self.bodyscores['scores'] = {}
                 self.bodyscores['scores']['bmi'] = score.getBmiDeductScore()
                 self.bodyscores['scores']['fat'] = score.getBodyFatDeductScore()
