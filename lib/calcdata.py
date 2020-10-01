@@ -138,11 +138,15 @@ class CalcData():
                 if idx in self.adjustments:
                     log.debug(' *** Calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
                     cf = self.adjustments[idx]
-                    self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
-                    # self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
-                    self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
-                    self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
-                    self.data['muscle'] = round(float(self.data['muscle']) * float(cf['muscle']), 2)
+                    if 'fat' in cf:
+                        self.data['fat'] = round(float(self.data['fat']) * float(cf['fat']), 2)
+                        # self.data['visceral'] = round(float(self.data['visceral']) * float(cf['visceral']), 2)
+                    if 'water' in cf:
+                        self.data['water'] = round(float(self.data['water']) * float(cf['water']), 2)
+                    if 'bone' in cf:
+                        self.data['bone'] = round(float(self.data['bone']) * float(cf['bone']), 2)
+                    if 'muscle' in cf:
+                        self.data['muscle'] = round(float(self.data['muscle']) * float(cf['muscle']), 2)
                 else:
                     log.debug('No calibration data found for {}, weight: {}{}'.format(self.user, self.weight, self.unit))
         except BaseException as e:

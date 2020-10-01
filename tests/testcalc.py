@@ -41,10 +41,10 @@ def libcheck():
 
 def testcase1():
     data_peter = {
-        "measured": 70.65,
+        "measured": 68.55,
         "calcweight": 70.65,
         "unit": 'kg',
-        "impedance": 485,
+        "impedance": 526,
         "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
         "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
     }
@@ -62,12 +62,14 @@ def testcase1():
 
     log.info('Calcluation based on data:{}'.format(data))
     mCalc = calcdata.CalcData(data, True)
-    mi_data = mCalc.getData('data')
-    if mCalc.ready:
-        mCalc.publishdata()
+    mi_data = mCalc.getData('string')
+    print(mi_data)
+    
+    # if mCalc.ready:
+    #     mCalc.publishdata()
 
-    else:
-        log.error("No data present !")
+    # else:
+    #     log.error("No data present !")
 
 
 def testcase2():

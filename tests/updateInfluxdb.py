@@ -32,7 +32,7 @@ def main():
         # datum,zeit,gewicht,knochen,fett,wasser,muskeln,bmi,timestamp
         # 31.12.2013,12:35,77.90,3.70,21.00,59.20,40.60,25.40,1388493300
         # ....
-        variables_file = '../data/gewichtsdaten.csv'
+        variables_file = '../data/peter.csv'
         reader = csv.DictReader(open(variables_file, 'r'), delimiter=',')
 
         # build the dict list
@@ -45,11 +45,11 @@ def main():
             dt_object = datetime.fromtimestamp(int(data['timestamp']))
             scaledata = {
                 "measured": float(data['gewicht']),
-                "calcweight": float(data['gewicht']),
+                "calcweight": float(data['gewicht']) * 2.00,
                 "unit": 'kg',
-                "impedance": impedance,
-                "timestamp": str(dt_object.strftime(DATEFORMAT_UTC)),
-                "scantime": str(dt_object.strftime('%Y-%m-%d %H:%M:%S'))
+                "impedance": int(data['impedance']),
+                "timestamp": "{} {}:00".format(data['datum'], data['zeit']),
+                "scantime": "{} {}:00".format(data['datum'], data['zeit'])
             }
 
             log.info('Calcluation based on data:{}'.format(scaledata))
