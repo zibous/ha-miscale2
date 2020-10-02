@@ -40,11 +40,12 @@ def libcheck():
 
 
 def testcase1():
+    ## 2018-11-22,07:51,68.40,461,3.60,11.50,66.30,45.90,22.30,1542873060
     data_peter = {
-        "measured": 68.55,
+        "measured": 72.80,
         "calcweight": 70.65,
         "unit": 'kg',
-        "impedance": 526,
+        "impedance": 478,
         "timestamp": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S')),
         "scantime": str(datetime.today().strftime('%Y-%m-%d %H:%M:%S'))
     }
@@ -64,7 +65,7 @@ def testcase1():
     mCalc = calcdata.CalcData(data, True)
     mi_data = mCalc.getData('string')
     print(mi_data)
-    
+
     # if mCalc.ready:
     #     mCalc.publishdata()
 
@@ -160,8 +161,30 @@ def testcase2():
     plt.savefig("impedance.png", dpi=600)
     plt.show()
 
+def fmtNumber(d):
+    return float('{:6.3f}'.format(float(d)))
+
+def checkRescaleData():
+
+    data_new = dict()
+    result = '{\n'
+    for index in sorted(USER1_ADJUSTMENTS.keys(),reverse=False):
+        data = USER1_ADJUSTMENTS[index]
+        data['bone'] = fmtNumber(data['bone'])
+        data['fat'] = fmtNumber(data['fat'])
+        data['water'] = fmtNumber(data['water'])
+        data['muscle'] = fmtNumber(data['muscle'] * 52.50 / 44.91)
+        s = '{' + '"bone":{}, "fat":{}, "water":{}, "muscle":{}'.format(data['bone'], data['fat'], data['water'], data['muscle'])+"},\n"
+        result += '"{}": '.format(index) + s 
+        data_new[index] = data
+    print("  \n")
+    result += "}"
+    # print(data_new)    
+    print(result)
 
 testcase1()
 
+
 # libcheck()
 # testcase2()
+# checkRescaleData()
