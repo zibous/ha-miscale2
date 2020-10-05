@@ -52,7 +52,7 @@ PAYLOAD :
 
 ### Optional use OpenMQTTGateway
 
-https://github.com/1technophile/OpenMQTTGateway
+https://github.com/1technophile/OpenMQTTGateway<br>
 https://github.com/1technophile/OpenMQTTGateway/issues/760
 
 **### Example for data payload from OpenMQTTGateway**
