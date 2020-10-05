@@ -111,7 +111,8 @@ Systemd service for  - on systemd powered systems the **recommended** option
    
    $ sudo systemctl enable ha-miscale-mqtt.service
    ```
-<br>
+<br/>
+
 ## MQTT Data for Homeassistant / Applications
 
 The calculation results are saved once as a history in the data folder, published as an MQTT payload and optionally saved in the defined InfluxDB.
@@ -139,7 +140,7 @@ These data are published by the "ESP32 Application" and can either be processed 
 }
 ```
 
-Topic: `tele/miscale2/Peter/data`<br>
+Topic: `tele/miscale2/Peter/data` <br/>
 This data is published by the "calc module"
 ```json
 {
@@ -173,10 +174,11 @@ This data is published by the "calc module"
    "attribution":"Data provided by Peter Siebler"
 }
 ```
-<br>
-Topic: `tele/miscale2/Peter/scores`<br>
-This data is published by the "calc module"
+<br/>
 
+
+Topic: `tele/miscale2/Peter/scores` <br/>
+This data is published by the "calc module"
 ```json
 {
 	"user": "Peter",
