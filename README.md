@@ -5,7 +5,7 @@ Code to read weight measurements from Xiaomi Body Scales.
 
 
 
-![app_states](/Users/ps_mac/appslab/ha-miscale2/docs/app_states.png)
+![app_states](docs/app_states.png)
 
 ## Prerequisites
 
