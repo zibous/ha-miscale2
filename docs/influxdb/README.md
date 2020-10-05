@@ -67,6 +67,50 @@ see: updateInfluxdb.py
 
 
 
+## Grafana Dashboard - Charts
+
+
+
+## ![grafana_weight_chart](grafana_weight_chart.png)
+
+
+
+
+
+![grafana_bmi_chart](grafana_bmi_chart.png)
+
+
+
+![grafana_body_data](grafana_body_data.png)
+
+
+
+![grafana_body_info](grafana_body_info.png)
+
+
+
+
+
+![grafana_chart_impedace](grafana_chart_impedace.png)
+
+
+
+![grafana_fat_chart](grafana_fat_chart.png)
+
+
+
+![grafana_muscle_chart](grafana_muscle_chart.png)
+
+
+
+![grafana_protein](grafana_protein.png)
+
+
+
+
+
+![grafana_water_chart](grafana_water_chart.png)
+
 <br><hr>
 
 ## Information
