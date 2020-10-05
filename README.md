@@ -25,7 +25,7 @@ An MQTT broker is needed as the counterpart for this daemon. Even though an MQTT
 
 - Optional Homeassistant, see [Settings & Views Homeassistant](docs/homeassistant/README.md)
 
-- Optional influxdb, see  [Influx DB & Grafana Dashboard](docs/homeassistant/README.md)
+- Optional influxdb, see  [Influx DB & Grafana Dashboard](docs/influxdb/README.md)
 
   
 
@@ -111,13 +111,36 @@ Systemd service for  - on systemd powered systems the **recommended** option
    
    $ sudo systemctl enable ha-miscale-mqtt.service
    ```
-
+<br>
 ## MQTT Data for Homeassistant / Applications
 
 The calculation results are saved once as a history in the data folder, published as an MQTT payload and optionally saved in the defined InfluxDB.
 
 **Sample MQTT Payload**
 
+Topic: `tele/miscale2/Peter/measured`<br>
+These data are published by the "ESP32 Application" and can either be processed directly in another application. In my case, this data is evaluated via the Python application and the additional data is calculated and then published (Infuxdb, Homeassistant).
+```json
+{
+	"user": "Peter",
+	"sex": "male",
+	"athletic": true,
+	"age": 64.85,
+	"weight": 68.2,
+	"unit": "kg",
+	"impedance": 539,
+	"bmi": 22.27,
+	"water": 43.11,
+	"fat": 18.4,
+	"timestamp": "2020-10-05 06:23:03",
+	"version": "1.0.1",
+	"icon": "mdi:scale-bathroom",
+	"attribution": "Data provided by Peter Siebler"
+}
+```
+
+Topic: `tele/miscale2/Peter/data`<br>
+This data is published by the "calc module"
 ```json
 {
    "measured":70.65,
@@ -150,6 +173,56 @@ The calculation results are saved once as a history in the data folder, publishe
    "attribution":"Data provided by Peter Siebler"
 }
 ```
+<br>
+Topic: `tele/miscale2/Peter/scores`<br>
+This data is published by the "calc module"
+
+```json
+{
+	"user": "Peter",
+	"score": 90.0,
+	"deltas": {
+		"weight": -0.8,
+		"fat": -0.21,
+		"water": 0.0,
+		"muscle": 0.0,
+		"visceral": -0.4,
+		"protein": 0.02
+	},
+	"states": {
+		"weight": "Abgenommen",
+		"fat": "Abgenommen",
+		"water": "Keine Ver\u00e4nderung",
+		"muscle": "Abgenommen",
+		"protein": "Zugenommen"
+	},
+	"scores": {
+		"bmi": 0.0,
+		"fat": 10.0,
+		"visceral": 0.0,
+		"muscle": 0.0,
+		"water": 0.0,
+		"bones": 0.0,
+		"bmr": 0.0,
+		"protein": 0.0
+	},
+	"caloric": {
+		"caloricmin": 2100,
+		"caloricmax": 2400,
+		"deficitmin": 1677,
+		"deficitmax": 1923
+	},
+	"engergieexp": 2491,
+	"macronut": { "protein": 872.0, "carbohydrates": 1246.0, "fat": 374.0 },
+	"version": "1.0.1",
+	"timestamp": "2020-10-05 06:23:03",
+	"icon": "mdi:scale-bathroom",
+	"attribution": "Data provided by Peter Siebler"
+}
+
+```
+<br>
+
 <br>
 <hr>
  
