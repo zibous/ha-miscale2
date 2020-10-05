@@ -11,7 +11,7 @@
 + ESP32
 <br/>
 
-  ![ESP32 NodeMCU](../docs/ESP32 NodeMCU.png)
+  ![ESP32 NodeMCU](../docs/ESP32NodeMCU.png)
 <br>
 + Platform IO
 + VSCODIUM
