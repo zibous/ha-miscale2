@@ -1,0 +1,72 @@
+type: "custom:mini-graph-card"
+style: |
+  .graph__legend {
+     flex-wrap: nowrap !important;
+  }  
+  ha-card {
+    transform: scale(1.00);
+    background-size: 100% 100%;
+  }
+align_icon: left
+align_state: center
+align_header: center
+entities:
+  - entity: sensor.reni_bmi
+    name: Body Mass Index
+    aggregate_func: max
+  - entity:  sensor.reni_ffm
+    name: Fett freie Masse
+    aggregate_func: max
+  - entity: sensor.reni_poi
+    name: Ponderal Index 
+    aggregate_func: max
+    y_axis: secondary
+name: Köperdaten
+font_size: 90
+font_size_header: 18
+height: 186
+hours_to_show: 168
+hour24: true
+more_info: true
+line_width: 2
+lower_bound_secondary: 10.00
+upper_bound_secondary: 18.00
+lower_bound: 12
+upper_bound: 30
+show:
+  icon_adaptive_color: true
+  name_adaptive_color: true
+  name: false
+  icon: false
+  state: true
+  fill: fade
+  legend: true
+  extrema: true
+  labels_secondary: true
+color_thresholds:
+  - value: 14
+    color: "#0277bd"
+  - value: 15
+    color: "#29b6f6"
+  - value: 16
+    color: "#b3e5fc"
+  - value: 17
+    color: "#ffeb3b"
+  - value: 18
+    color: "#fb8c00"
+  - value: 19
+    color: "#fbc02d"
+  - value: 20
+    color: "#f57f17"
+  - value: 21
+    color: "#ef6c00"
+  - value: 22
+    color: "#ff6434"
+  - value: 23
+    color: "#ff5722"
+  - value: 25
+    color: "#ff3d00"
+  - value: 26
+    color: "#dd2c00"
+  - value: 30
+    color: "#a30000"

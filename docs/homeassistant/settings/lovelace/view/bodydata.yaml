@@ -1,0 +1,647 @@
+## ######################################################
+##
+##   FITNESS DATA - BODY
+##
+## ######################################################
+
+icon: "mdi:scale-bathroom"
+title: Körperdaten
+id: bodydata
+panel: true
+path: bodydata
+
+cards:
+  - type: custom:layout-card
+    column_num: 1
+    max_columns: 3
+    column_width: 2700
+    max_width: 4500
+    layout: horizontal
+    cards:
+
+      ## ###############################################
+      - type: custom:layout-card
+        max_width: 1020
+        column_num: 1
+        max_columns: 1
+        rebuild: 500
+        layout: horizontal
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: "custom:button-card"
+                name: "❖ Fitness / Körperdaten"
+                template: headline
+
+## PETER ------------------------------------------------
+
+      ## ###############################################
+      - type: custom:layout-card
+        max_width: 980
+        column_num: 1
+        max_columns: 1
+        rebuild: 500
+        layout: horizontal
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: "custom:button-card"
+                name: "Statistik für Peter"
+                template: title
+      - break
+
+      ## ##########################################            
+      - type: custom:layout-card
+        max_width: 820
+        column_num: 1
+        max_columns: 1
+        rebuild: 500
+        layout: horizontal
+        cards:
+           - !include ../cards/fitness/peter-bodydata-chart.yaml
+          #  - !include ../cards/fitness/peter-scale-chart.yaml
+
+      - break
+
+      ## ###############################################
+      - type: custom:layout-card
+        max_width: 820
+        column_num: 1
+        max_columns: 1
+        rebuild: 500
+        layout: horizontal
+        cards:
+
+
+      ## ###############################################
+          - type: "custom:homekit-card"
+            useBrightness: false
+            titleColor: "#fff"
+            enableColumns: false
+            statePositionTop: true
+            home: false
+            style: |
+                .card-title {
+                  font-size: 1.25em !important;
+                  line-height: 3em !important;
+                  padding-top: 18px !important;
+                }
+                .name {
+                  font-size: 0.90em !important;
+                }
+                .state{
+                  overflow: hidden !important;
+                  text-overflow: ellipsis !important;
+                }
+            entities:
+              - title: "Auswertung"
+                entities:
+                  - card: custom:mini-graph-card
+                    wider: true
+                    higher: true
+                    higherSize: 1
+                    cardOptions: 
+                      line_width: 1
+                      animate: true
+                      hours_to_show: 168
+                      group_by: date
+                      aggregate_func: max
+                      icon: "mdi:human-pregnant"
+                      entities:
+                        - entity: sensor.peter_bmi
+                          name: "BMI"
+                          color: "#34495e"
+                      show:
+                        graph: bar
+                        legend: false
+                        points: false
+                        labels: false
+                      cardStyle: |
+                        .header {padding: 0;}
+                        .header .icon {color: #f7d959;}
+                        .states {padding: 0;}
+                        .states .state .state__value {font-size:12px;}
+                  - card: custom:mini-graph-card
+                    wider: true                         
+                    higher: true
+                    higherSize: 1
+                    cardOptions: 
+                      line_width: 1
+                      animate: true
+                      hours_to_show: 168
+                      group_by: date
+                      aggregate_func: max
+                      icon: "mdi:weight-lifter"
+                      entities:
+                        - entity: sensor.peter_poi
+                          name: "POI"
+                          color: "#00bcd4" 
+                      show:
+                        graph: bar
+                        legend: false
+                        points: false
+                        labels: false
+                      cardStyle: |
+                        .header {padding: 0;}
+                        .header .icon {color: #f7d959;}
+                        .states {padding: 0;}
+                        .states .state .state__value {font-size:12px;}
+                  - card: custom:mini-graph-card
+                    wider: true                         
+                    higher: true
+                    higherSize: 1
+                    cardOptions: 
+                      line_width: 1
+                      animate: true
+                      hours_to_show: 168
+                      aggregate_func: max
+                      group_by: date
+                      icon: "mdi:tape-measure"
+                      entities:
+                        - entity: sensor.peter_ffm
+                          name: "FFM"
+                          color: "#e74c3c"
+                      show:
+                        graph: bar
+                        legend: false
+                        points: false
+                        labels: false
+                      cardStyle: |
+                        .header {padding: 0;}
+                        .header .icon {color: #f7d959;}
+                        .states {padding: 0;}
+                        .states .state .state__value {font-size:12px;}
+
+
+          ## ###############################################
+          - type: "custom:homekit-card"
+            useBrightness: false
+            titleColor: "#fff"
+            enableColumns: false
+            statePositionTop: true
+            home: false
+            style: |
+                .card-title {
+                  font-size: 1.25em !important;
+                  line-height: 3em !important;
+                  padding-top: 18px !important;
+                }
+                .name {
+                  font-size: 0.90em !important;
+                }
+                .state{
+                  overflow: hidden !important;
+                  text-overflow: ellipsis !important;
+                }
+            entities:
+              - title: "Bewertung"
+                entities:
+                   - entity: sensor.peter_gewicht
+                     name: Gewicht
+                     icon: "mdi:weight-kilogram"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_gewicht
+                   - entity: sensor.peter_bmi
+                     name: Body Mass Index
+                     icon: "mdi:weight-lifter"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_bmi
+                   - entity: sensor.peter_poi
+                     name: Ponderal Index
+                     icon: "mdi:weight-lifter"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_poi
+                   - entity:  sensor.peter_ffm
+                     name: Fettfreiemasse
+                     icon: "mdi:tape-measure"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_ffm
+                   - entity:   sensor.peter_ffm_index
+                     name: FFM Index
+                     icon: "mdi:tape-measure"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_ffm_index
+                   - entity:  sensor.peter_impedanz
+                     name: Impedanz
+                     icon: "mdi:tape-measure"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_impedanz
+                       
+                        
+
+              - title: "Körperzusammensetzung"
+                entities: 
+                   - entity:  sensor.peter_koperfett
+                     name: Körperfett
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_koperfett
+                   - entity: sensor.peter_viszerales_fett
+                     name: Viszerales Fett
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_viszerales_fett
+                   - entity:   sensor.peter_muskeln
+                     name: Muskeln
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_muskeln
+                   - entity:  sensor.peter_korperwasser
+                     name: Körperwasser
+                     icon: "mdi:water-percent"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_korperwasser
+                   - entity:   sensor.peter_knochen
+                     name: Knochenanteil
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_knochen
+                   - entity: sensor.peter_eiweis
+                     name: Eiweis
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_eiweis
+
+              - title: "Ernährung"
+                entities: 
+                   - entity:  sensor.peter_grundumsatz
+                     name: Grundumsatz
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_grundumsatz
+                   - entity:  sensor.peter_kalorienbedarf
+                     name: Kalorienbedarf
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_kalorienbedarf
+                   - entity:  sensor.peter_metabolisches_alter
+                     icon: "mdi:language-lua"
+                     name: Met. Alter
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_metabolisches_alter
+                   - entity:  sensor.peter_korperwerte
+                     name: Körper Index 
+                     icon: "mdi:clock-outline"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_korperwerte
+                   - entity:  sensor.peter_messung
+                     name: Messung am
+                     icon: "mdi:clock-outline"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.peter_messung
+
+              - title: "Makronährstoffe"
+                entities: 
+                   - entity:  sensor.peter_kohlenhydrate_makronahrstoff
+                     name: Kohlenhydrate
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_kohlenhydrate_makronahrstoff
+                   - entity:  sensor.peter_eiweis_makronahrstoff
+                     name: Eiweis
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_eiweis_makronahrstoff
+                   - entity:  sensor.peter_fett_makronahrstoff
+                     name: Fett
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_fett_makronahrstoff
+                   - entity:  sensor.peter_kalorien_min
+                     name: Min. Kalorien
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_kalorien_min
+                   - entity:  sensor.peter_kalorien_max
+                     name: Max. Kalorien
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.peter_kalorien_max
+
+
+## RENI -------------------------------------------------
+
+      ## ###############################################
+      - type: custom:layout-card
+        max_width: 980
+        column_num: 1
+        max_columns: 1
+        rebuild: 500
+        layout: horizontal
+        cards:
+          - type: horizontal-stack
+            cards:
+              - type: "custom:button-card"
+                name: "Statistik für Reni"
+                template: title
+      - break
+
+      ## ##########################################            
+      - type: custom:layout-card
+        max_width: 820
+        column_num: 1
+        max_columns: 1
+        rebuild: 500
+        layout: horizontal
+        cards:
+           - !include ../cards/fitness/reni-bodydata-chart.yaml
+          #  - !include ../cards/fitness/reni-scale-chart.yaml
+
+      - break
+
+      ## ###############################################
+      - type: custom:layout-card
+        max_width: 820
+        column_num: 1
+        max_columns: 1
+        rebuild: 500
+        layout: horizontal
+        cards:
+
+
+      ## ###############################################
+          - type: "custom:homekit-card"
+            useBrightness: false
+            titleColor: "#fff"
+            enableColumns: false
+            statePositionTop: true
+            home: false
+            style: |
+                .card-title {
+                  font-size: 1.25em !important;
+                  line-height: 3em !important;
+                }
+            entities:
+              - title: "Auswertung"
+                entities:
+                  - card: custom:mini-graph-card
+                    wider: true
+                    higher: true
+                    higherSize: 1
+                    cardOptions: 
+                      line_width: 1
+                      animate: true
+                      hours_to_show: 168
+                      group_by: date
+                      aggregate_func: max
+                      icon: "mdi:human-pregnant"
+                      entities:
+                        - entity: sensor.reni_bmi
+                          name: "BMI"
+                          color: "#34495e"
+                      show:
+                        graph: bar
+                        legend: false
+                        points: false
+                        labels: false
+                      cardStyle: |
+                        .header {padding: 0;}
+                        .header .icon {color: #f7d959;}
+                        .states {padding: 0;}
+                        .states .state .state__value {font-size:12px;}
+                  - card: custom:mini-graph-card
+                    wider: true                         
+                    higher: true
+                    higherSize: 1
+                    cardOptions: 
+                      line_width: 1
+                      animate: true
+                      hours_to_show: 168
+                      group_by: date
+                      aggregate_func: max
+                      icon: "mdi:weight-lifter"
+                      entities:
+                        - entity: sensor.reni_poi
+                          name: "POI"
+                          color: "#00bcd4" 
+                      show:
+                        graph: bar
+                        legend: false
+                        points: false
+                        labels: false
+                      cardStyle: |
+                        .header {padding: 0;}
+                        .header .icon {color: #f7d959;}
+                        .states {padding: 0;}
+                        .states .state .state__value {font-size:12px;}
+                  - card: custom:mini-graph-card
+                    wider: true                         
+                    higher: true
+                    higherSize: 1
+                    cardOptions: 
+                      line_width: 1
+                      animate: true
+                      hours_to_show: 168
+                      aggregate_func: max
+                      group_by: date
+                      icon: "mdi:tape-measure"
+                      entities:
+                        - entity: sensor.reni_ffm
+                          name: "FFM"
+                          color: "#e74c3c"
+                      show:
+                        graph: bar
+                        legend: false
+                        points: false
+                        labels: false
+                      cardStyle: |
+                        .header {padding: 0;}
+                        .header .icon {color: #f7d959;}
+                        .states {padding: 0;}
+                        .states .state .state__value {font-size:12px;}
+
+
+          ## ###############################################
+          - type: "custom:homekit-card"
+            useBrightness: false
+            titleColor: "#fff"
+            enableColumns: false
+            statePositionTop: true
+            home: false
+            style: |
+                .card-title {
+                  font-size: 1.25em !important;
+                  line-height: 3em !important;
+                }
+            entities:
+              - title: "Bewertung"
+                entities:
+                   - entity: sensor.reni_gewicht
+                     name: Gewicht
+                     icon: "mdi:weight-kilogram"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_gewicht
+                   - entity: sensor.reni_bmi
+                     name: Body Mass Index
+                     icon: "mdi:weight-lifter"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_bmi
+                   - entity: sensor.reni_poi
+                     name: Ponderal Index
+                     icon: "mdi:weight-lifter"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_poi
+                   - entity:  sensor.reni_ffm
+                     name: Fettfreiemasse
+                     icon: "mdi:tape-measure"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_ffm
+                   - entity:   sensor.reni_ffm_index
+                     name: FFM Index
+                     icon: "mdi:tape-measure"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_ffm_index
+                   - entity:  sensor.reni_impedanz
+                     name: Impedanz
+                     icon: "mdi:tape-measure"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_impedanz
+                       
+                        
+
+              - title: "Körperzusammensetzung"
+                entities: 
+                   - entity:  sensor.reni_koperfett
+                     name: Körperfett
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_koperfett
+                   - entity: sensor.reni_viszerales_fett
+                     name: Viszerales Fett
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_viszerales_fett
+                   - entity:   sensor.reni_muskeln
+                     name: Muskeln
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_muskeln
+                   - entity:  sensor.reni_korperwasser
+                     name: Körperwasser
+                     icon: "mdi:water-percent"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_korperwasser
+                   - entity:   sensor.reni_knochen
+                     name: Knochenanteil
+                     icon: "mdi:percent-outline"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_knochen
+                   - entity: sensor.reni_eiweis
+                     name: Eiweis
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_eiweis
+
+              - title: "Ernährung"
+                entities: 
+                   - entity:  sensor.reni_grundumsatz
+                     name: Grundumsatz
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_grundumsatz
+                   - entity:  sensor.reni_kalorienbedarf
+                     name: Kalorienbedarf
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_kalorienbedarf
+                   - entity:  sensor.reni_metabolisches_alter
+                     icon: "mdi:language-lua"
+                     name: Met. Alter
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_metabolisches_alter
+                   - entity:  sensor.reni_korperwerte
+                     name: Körper Index 
+                     icon: "mdi:clock-outline"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_korperwerte
+                   - entity:  sensor.reni_messung
+                     name: Messung am
+                     icon: "mdi:clock-outline"
+                     tap_action:
+                       action: more-info
+                       entity: sensor.reni_messung
+
+              - title: "Makronährstoffe"
+                entities: 
+                   - entity:  sensor.reni_kohlenhydrate_makronahrstoff
+                     name: Kohlenhydrate
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_kohlenhydrate_makronahrstoff
+                   - entity:  sensor.reni_eiweis_makronahrstoff
+                     name: Eiweis
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_eiweis_makronahrstoff
+                   - entity:  sensor.reni_fett_makronahrstoff
+                     name: Fett
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_fett_makronahrstoff
+                   - entity:  sensor.reni_kalorien_min
+                     name: Min. Kalorien
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_kalorien_min
+                   - entity:  sensor.reni_kalorien_max
+                     name: Max. Kalorien
+                     icon: "mdi:nutrition"
+                     tap_action:
+                       action: more-info
+                       entity:  sensor.reni_kalorien_max
+
+
+      - break
+      - type: custom:html-card
+        style: |
+          ha-card {
+            background-color: transparent;
+            box-shadow:none;
+            height:30px;
+            text-align:right;
+            font-size:0.85em;
+            }
+        content: |
+          <br/>&copy 2020 Peter Siebler   -   Made with <span style="color: #e25555;">&hearts;</span> in Austria, Höchst.

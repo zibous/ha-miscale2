@@ -4,6 +4,8 @@ The Modul calcdata.py m is built to collect information from mi scale and send i
 
 
 
+
+
 ## Prepare Database
 ```bash
 $ influx
@@ -35,7 +37,38 @@ $ python3 updateInfluxdb.py
 
 
 
+Publish Data to Influx DB
+
+see: updateInfluxdb.py
+
+```python
+.....
+
+# initialize the calc module with the data from the csv file
+  mCalc = calcdata.CalcData(scaledata, True)
+
+  # get the userdata
+  mi_userdata = mCalc.getUserData()
+
+  # calculate all miscale data
+    log.info('Calcluation for user :{}, Date:{}'.format(mi_userdata['name'], scaledata['timestamp']))
+
+    mi_data = mCalc.getData('alldata')
+    
+    if mCalc.ready:
+    # publish data to influxdb
+    datasections = {
+       "influxdb": True
+                }
+    mCalc.publishdata(datasections)
+
+...
+```
+
+
+
 <br><hr>
+
 ## Information
 - https://www.influxdata.com/blog/getting-started-python-influxdb/<br>
 - https://github.com/influxdata/influxdb-python <br>

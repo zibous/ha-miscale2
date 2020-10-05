@@ -1,0 +1,145 @@
+## ########################################
+## BODYSCALE DATA RENI
+## ########################################
+
+
+#tele/miscale2/Reni/data
+
+#  { 
+#    "measured": 68.2, 
+#    "calcweight": 136.4, 
+#    "impedance": 533, 
+#    "unit": "kg", 
+#    "user": "Reni", 
+#    "id": "5c:ca:d3:4c:ee:74", 
+#    "version": "1.0.0", 
+#    "timestamp": "2020-09-27 05:43:45", 
+#    "lastscan": "2020-09-26 17:35:34", 
+#    "scantime": "2020-09-27 06:43:20", 
+#    "sex": "male", 
+#    "athletic": true, 
+#    "age": 64.83, 
+#    "metabolic_age": 40.64, 
+#    "bmi": 22.27, 
+#    "poi": 12.73, 
+#    "bodytype": "Ausgeglichen", 
+#    "weight": 68.2, 
+#    "idealweight": 66.5, 
+#    "targetweight": 70.0, 
+#    "lbm": 54.65, 
+#    "fat": 11.74, 
+#    "fattype": "to_gain", 
+#    "idealfat": 11.5, 
+#    "visceral": 6.05, 
+#    "water": 65.82, 
+#    "bone": 3.57, 
+#    "muscle": 51.11, 
+#    "ffm": 54.16, 
+#    "ffmi": 17.68, 
+#    "protein": 20.78, 
+#    "bmr": 1186.0, 
+#    "tdee": 2491, 
+#    "icon": "mdi:scale-bathroom", 
+#    "attribution": "Data provided by Reni Siebler"
+# }
+
+- platform: mqtt
+  name: "Reni Gewicht"
+  state_topic: "tele/miscale2/Reni/data"
+  value_template: "{{ float(value_json.weight) | default(0.00) | float  }}"
+  unit_of_measurement: "kg"
+  json_attributes_topic: "tele/miscale2/Reni/data"
+
+- platform: mqtt
+  name: "Reni Impedanz"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','impedance') | default(0) | int  }}"
+  unit_of_measurement: "\u2126"
+
+- platform: mqtt
+  name: "Reni BMI"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','bmi') | default(0.00) | float  }}"
+  unit_of_measurement: "kg/㎡"
+
+- platform: mqtt
+  name: "Reni POI"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','poi') | default(0.00) | float  }}"
+  unit_of_measurement: "kg/㎥"
+
+- platform: mqtt
+  name: "Reni Messung"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ (state_attr('sensor.reni_gewicht','scantime')) }}"
+
+- platform: mqtt
+  name: "Reni Metabolisches Alter"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','metabolic_age') | default(0.00) | float  }}"
+  unit_of_measurement: "Jahre"
+
+- platform: mqtt
+  name: "Reni Fettfreie Körpermasse"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','lbm') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni Köperfett"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','fat') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni viszerales Fett"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','visceral') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni Körperwasser"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','water') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni Knochen"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','bone') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni Muskeln"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','muscle') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni FFM"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','ffm') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni FFM Index"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','ffmi') | default(0.00) | float  }}"
+
+- platform: mqtt
+  name: "Reni Eiweis"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','protein') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Reni Grundumsatz"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','bmr') | default(0.00) | float  }}"
+  unit_of_measurement: "kcal"
+
+- platform: mqtt
+  name: "Reni Energiebedarf"
+  state_topic: "tele/miscale2/Reni/measured"
+  value_template: "{{ state_attr('sensor.reni_gewicht','tdee') | default(0.00) | float  }}"
+  unit_of_measurement: "kcal"

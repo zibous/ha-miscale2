@@ -3,11 +3,16 @@
 ## Body Composition Scale 2 (XMTZC05HM) Data to MQTT / Influxdb
 Code to read weight measurements from Xiaomi Body Scales.
 
+
+
+![app_states](/Users/ps_mac/appslab/ha-miscale2/docs/app_states.png)
+
 ## Prerequisites
 
 An MQTT broker is needed as the counterpart for this daemon. Even though an MQTT-less mode is provided, it is not recommended for normal smart home automation integration. MQTT is huge help in connecting different parts of your smart home and setting up of a broker is quick and easy.
 
 - Body Composition Scale 2 (XMTZC05HM)
+- ESP32 (BLE SCANNER)
 - Raspberry or Linux computer
 - Python 3 (min)
 - MQTT broker

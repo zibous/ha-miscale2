@@ -1,0 +1,145 @@
+## ########################################
+## BODYSCALE DATA PETER
+## ########################################
+
+
+#tele/miscale2/Peter/data
+
+#  { 
+#    "measured": 68.2, 
+#    "calcweight": 136.4, 
+#    "impedance": 533, 
+#    "unit": "kg", 
+#    "user": "Peter", 
+#    "id": "5c:ca:d3:4c:ee:74", 
+#    "version": "1.0.0", 
+#    "timestamp": "2020-09-27 05:43:45", 
+#    "lastscan": "2020-09-26 17:35:34", 
+#    "scantime": "2020-09-27 06:43:20", 
+#    "sex": "male", 
+#    "athletic": true, 
+#    "age": 64.83, 
+#    "metabolic_age": 40.64, 
+#    "bmi": 22.27, 
+#    "poi": 12.73, 
+#    "bodytype": "Ausgeglichen", 
+#    "weight": 68.2, 
+#    "idealweight": 66.5, 
+#    "targetweight": 70.0, 
+#    "lbm": 54.65, 
+#    "fat": 11.74, 
+#    "fattype": "to_gain", 
+#    "idealfat": 11.5, 
+#    "visceral": 6.05, 
+#    "water": 65.82, 
+#    "bone": 3.57, 
+#    "muscle": 51.11, 
+#    "ffm": 54.16, 
+#    "ffmi": 17.68, 
+#    "protein": 20.78, 
+#    "bmr": 1186.0, 
+#    "tdee": 2491, 
+#    "icon": "mdi:scale-bathroom", 
+#    "attribution": "Data provided by Peter Siebler"
+# }
+
+- platform: mqtt
+  name: "Peter Gewicht"
+  state_topic: "tele/miscale2/Peter/data"
+  value_template: "{{ float(value_json.weight) | default(0.00) | float  }}"
+  unit_of_measurement: "kg"
+  json_attributes_topic: "tele/miscale2/Peter/data"
+
+- platform: mqtt
+  name: "Peter Impedanz"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','impedance') | default(0) | int  }}"
+  unit_of_measurement: "\u2126"
+
+- platform: mqtt
+  name: "Peter BMI"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','bmi') | default(0.00) | float  }}"
+  unit_of_measurement: "kg/㎡"
+
+- platform: mqtt
+  name: "Peter POI"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','poi') | default(0.00) | float  }}"
+  unit_of_measurement: "kg/㎥"
+
+- platform: mqtt
+  name: "Peter Messung"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ (state_attr('sensor.peter_gewicht','scantime')) }}"
+
+- platform: mqtt
+  name: "Peter Metabolisches Alter"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','metabolic_age') | default(0.00) | float  }}"
+  unit_of_measurement: "Jahre"
+
+- platform: mqtt
+  name: "Peter Fettfreie Körpermasse"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','lbm') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter Köperfett"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','fat') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter viszerales Fett"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','visceral') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter Körperwasser"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','water') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter Knochen"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','bone') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter Muskeln"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','muscle') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter FFM"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','ffm') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter FFM Index"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','ffmi') | default(0.00) | float  }}"
+
+- platform: mqtt
+  name: "Peter Eiweis"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','protein') | default(0.00) | float  }}"
+  unit_of_measurement: "%"
+
+- platform: mqtt
+  name: "Peter Grundumsatz"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','bmr') | default(0.00) | float  }}"
+  unit_of_measurement: "kcal"
+
+- platform: mqtt
+  name: "Peter Energiebedarf"
+  state_topic: "tele/miscale2/Peter/measured"
+  value_template: "{{ state_attr('sensor.peter_gewicht','tdee') | default(0.00) | float  }}"
+  unit_of_measurement: "kcal"

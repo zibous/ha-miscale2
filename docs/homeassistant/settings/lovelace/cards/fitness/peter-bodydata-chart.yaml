@@ -1,0 +1,52 @@
+type: "custom:mini-graph-card"
+style: |
+  .graph__legend {
+     flex-wrap: nowrap !important;
+  }  
+  ha-card {
+    transform: scale(1.00);
+    background-size: 100% 100%;
+  }
+align_icon: left
+align_state: center
+align_header: center
+entities:
+  - entity: sensor.peter_gewicht
+    aggregate_func: max
+    name: Gewicht
+    color: "#05BE65"
+  - entity:  sensor.peter_korperwasser
+    name: Wasser
+    aggregate_func: max
+    color: "#3B58FD"
+  - entity: sensor.peter_muskeln
+    name: Muskeln
+    aggregate_func: max
+    color: "#F98900"
+  - entity: sensor.peter_koperfett
+    name: Fett
+    aggregate_func: max
+    color: "#F52125"
+    y_axis: secondary
+name: Köperdaten
+font_size: 90
+font_size_header: 18
+height: 186
+hours_to_show: 372
+group_by: date
+aggregate_func: max
+hour24: true
+more_info: true
+line_width: 1
+lower_bound_secondary: 5.00
+upper_bound_secondary: 25.00
+show:
+  icon_adaptive_color: true
+  name_adaptive_color: true
+  name: false
+  icon: false
+  state: true
+  fill: fade
+  legend: true
+  extrema: true
+  labels_secondary: true
