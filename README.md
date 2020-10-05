@@ -12,13 +12,22 @@ Code to read weight measurements from Xiaomi Body Scales.
 An MQTT broker is needed as the counterpart for this daemon. Even though an MQTT-less mode is provided, it is not recommended for normal smart home automation integration. MQTT is huge help in connecting different parts of your smart home and setting up of a broker is quick and easy.
 
 - Body Composition Scale 2 (XMTZC05HM)
-- ESP32 (BLE SCANNER)
-- Raspberry or Linux computer
-- Python 3 (min)
-- MQTT broker
-- Libs see requirements.txt
-- Optional influxdb
 
+- ESP32 (BLE SCANNER),  see  [ESP32 Application](esp32/README.md)
+
+- Raspberry or Linux computer
+
+- Python 3 (min)
+
+- MQTT broker
+
+- Libs see requirements.txt
+
+- Optional Homeassistant, see [Settings & Views Homeassistant](docs/homeassistant/README.md)
+
+- Optional influxdb, see  [Influx DB & Grafana Dashboard](docs/homeassistant/README.md)
+
+  
 
 ## Installation
 
@@ -70,48 +79,8 @@ Read [Xiaomi Mi Body Composition Scale](https://www.mi.com/global/mi-body-compos
 ## MQTT service for ESP32 Devices
 A simple Python script which provides a MQTT gateway for ESP Devices, easily extensible via custom workers. Application for ESP Devices see:
 
-https://github.com/1technophile/OpenMQTTGateway
+Details see :  [ESP 32 Appliciaton]( esp32/README.md)
 
-### Execution
-`python3 mqttservice.py`
-
-### Example for data payload from OpenMQTTGateway
-```json
-MQTT TOPIC: tele/BTtoMQTT/5CCAD34CEE74
-
-PAYLOAD : 
-   {  "id":"5C:CA:D3:4C:EE:74",
-      "name":"MIBFS",
-      "manufacturerdata":"57015ccad34cee74",
-      "rssi":-68,
-      "distance":2.799256,
-      "model":"XMTZC05HM",
-      "measured":70.5,
-      "impedance":485,
-      "unit":"kg",
-      "user":"7",
-      "calcweight":141,
-      "scantime":"2020-09-26 16:26:15"
-   }
-```
-
-### Example for data payload from ESP32 simple application
-```json
-MQTT TOPIC: tele/bodyscale/data
-
-PAYLOAD :
-   { "measured": 71.00, 
-     "calcweight": 142.00, 
-     "impedance": 489, 
-     "unit":"kg", 
-     "user":"7", 
-     "id":"5c:ca:d3:4c:ee:74", 
-     "version":"1.0.4", 
-     "timestamp":"2020-09-26 12:53:53", 
-     "lastscan":"2020-09-25 16:23:10", 
-     "scantime":"2020-09-26 13:37:44"
-   }
-```
 
 
 ## Configuration
@@ -183,8 +152,10 @@ The calculation results are saved once as a history in the data folder, publishe
 ```
 <br>
 <hr>
+ 
 
 # Acknowledgements:
+
 + Thanks @lolouk44 to https://github.com/lolouk44/xiaomi_mi_scale<br>
 + Formulas to calculate the various values/measures, I've got them from https://github.com/wiecosystem/Bluetooth
 
