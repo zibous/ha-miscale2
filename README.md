@@ -1,5 +1,6 @@
 # Connector for Xiaomi Mi Scale - Develop Version
 
+
 ## Body Composition Scale 2 (XMTZC05HM) Data to MQTT / Influxdb
 Code to read weight measurements from Xiaomi Body Scales.
 

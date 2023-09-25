@@ -9,7 +9,11 @@ internal/
 archiv/
 .history/
 *.log
-
+.esphome/
+cache/
+archiv/
+build/
+firmwares/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

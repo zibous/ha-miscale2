@@ -1,0 +1,516 @@
+## -------------------------------------------------------------------------------------------
+## ESP32 BLE FOR XIAMI BODYSCALE II
+## docker run --rm -v "${PWD}":/config -it esphome/esphome:2022.12.8 compile mismartscale.yaml
+## -------------------------------------------------------------------------------------------
+substitutions:
+
+  ## device settings
+  device_name_short: "mismartscale"
+  device_description: "Testdevice: Mi Smart Scale 2 on ESP32"
+  projectname: "MI-Smartscale.Peter-Siebler"
+  appversion: "2.1.0"
+  mac: "5C:CA:D3:4C:EE:74"
+
+  ## mqtt settings
+  attribution: "Data provided by Peter Siebler"
+  application: "ESP32 ESPHOME APP"
+  topic_data: "tele/bodyscale/data"
+
+  ## logger settings
+  log_level: "VERBOSE" # not that logging need memory, so in production mode use "WARN"
+  log_baudrate: "0" # 0 disable uart logger messages
+
+## ---------------------------------------------------
+## BOARD
+## ---------------------------------------------------
+esp32:
+  board: az-delivery-devkit-v4
+
+## ---------------------------------------------------
+## ESPHOME APPLICATION
+## ---------------------------------------------------
+esphome:
+  name: ${device_name_short}
+  # friendly_name: ${device_name_short}
+  comment: ${device_description}
+  project:
+    name: ${projectname}
+    version: ${appversion}
+  build_path: ./build/${device_name_short}
+  platformio_options:
+    platform: espressif32
+    board: az-delivery-devkit-v4
+    board_build.mcu: esp32
+    board_build.f_cpu: 240000000L
+  on_boot:
+    then:
+      - logger.log:
+          level: WARN
+          tag: "system"
+          format: "BOOTMESSAGE:${device_name_short} API is connected, Device ready!"
+      - globals.set:
+          id: boot_counter
+          value: !lambda "return id(boot_counter)+=1;"
+      - component.update: bootcounter
+  on_shutdown:
+    then:
+      - logger.log:
+          level: ERROR
+          tag: "system"
+          format: "BOOTMESSAGE:${device_name_short} is down!"
+
+## ---------------------------------------------------
+## COMPONENT Logger
+## ---------------------------------------------------
+logger:
+  id: appslogger
+  level: ${log_level}
+  # baud_rate: ${log_baudrate}
+  logs:
+    sensor: WARN
+    binary_sensor: WARN
+    switch: WARN
+    sensor.filter: WARN
+    text_sensor: WARN
+    json: ERROR
+    mqtt: ERROR
+    mqtt.component: ERROR
+    wifi: WARN
+    api.service: ERROR
+    scheduler: ERROR
+    esp32_ble_tracker: WARN
+    sntp: ERROR
+    esp32.preferences: ERROR
+    component: WARN
+
+## ---------------------------------------------------
+## COMPONENT Global variables
+## ---------------------------------------------------
+globals:
+  # internal boot counter
+  - id: boot_counter
+    type: int
+    restore_value: yes
+    initial_value: "0"
+
+  # last value weight sensor testcase
+  - id: last_weight
+    type: float
+    restore_value: yes
+    initial_value: "50.00"
+
+  # last value impedance sensor testcase
+  - id: last_impedance
+    type: int
+    restore_value: yes
+    initial_value: "567"
+
+## ---------------------------------------------------
+## COMPONENT OTA
+## ---------------------------------------------------
+ota:
+  password: "286429e1639e5854afe8f918f0fb1647"
+  on_begin:
+    then:
+      - logger.log:
+          format: "OTA Start"
+          tag: "OTA"
+          level: WARN
+  on_progress:
+    then:
+      - logger.log:
+          level: WARN
+          tag: "OTA"
+          format: "OTA progress %0.1f%%"
+          args: ["x"]
+  on_end:
+    then:
+      - logger.log:
+          format: "OTA End"
+          tag: "OTA"
+          level: WARN
+  on_error:
+    then:
+      - logger.log:
+          format: "OTA update error %d"
+          tag: "OTA"
+          level: ERROR
+          args: ["x"]
+
+# ---------------------------------------------------
+# External components
+# ---------------------------------------------------
+external_components:
+
+  # syslog component from github (new version)
+  # - source: github://TheStaticTurtle/esphome_syslog
+  #   components: [syslog]
+  #   refresh: 0s
+
+  # optinal: use local component from
+  # https://github.com/TheStaticTurtle/esphome_syslog
+  - source:
+      type: local
+      path: my_components
+    components: [syslog]
+
+## ---------------------------------------------------
+## COMPONENT SYSLOG
+## ---------------------------------------------------
+syslog:
+  ip_address: !secret syslog_server
+  port: !secret syslog_port
+  min_level: DEBUG
+  enable_logger: true
+
+## ---------------------------------------------------
+## COMPONENT WIFI
+## ---------------------------------------------------
+wifi:
+  networks:
+    # living room apple capsulate accesspoint 2.4Ghz
+    - ssid: !secret ssid2_name
+      password: !secret ssid2_pswd
+
+    # office apple capsulate accesspoint 2.4Ghz
+    - ssid: !secret ssid3_name
+      password: !secret ssid3_pswd
+
+    # unifi accesspoint 2.4Ghz
+    - ssid: !secret ssid4_name
+      password: !secret ssid4_pswd
+
+  domain: !secret domain
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap: {}
+
+captive_portal:
+
+# ---------------------------------------
+# COMPONENT MQTT Brocker
+# ---------------------------------------
+mqtt:
+  broker: !secret mqtt_broker1
+  port: !secret mqtt_port1
+  username: !secret mqtt_username1
+  password: !secret mqtt_password1
+  id: ${device_name_short}_client
+  discovery: true
+  # disable for mqtt silent mode
+  # topic_prefix: tele/${device_name_short}
+  log_topic: null # disable logging
+  birth_message:
+    topic: tele/${device_name_short}/LWT
+    payload: online
+  will_message:
+    topic: tele/${device_name_short}/LWT
+    payload: offline
+
+## ---------------------------------------------------
+## COMPONENT WEBSERVER
+## ---------------------------------------------------
+web_server:
+  port: 80
+  version: 2
+  js_url: !secret webserver_jsurl
+
+## ---------------------------------------------------
+## COMPONENT BLE TRACKER
+## ---------------------------------------------------
+esp32_ble_tracker:
+
+## ---------------------------------------------------
+## COMPONENT SNTP Time server
+## ---------------------------------------------------
+time:
+  - platform: sntp
+    id: time_sntp
+    timezone: Europe/Berlin
+    servers:
+      - !secret local_sntp
+      - 0.at.pool.ntp.org
+      - 0.pool.ntp.org
+    on_time_sync:
+      then:
+        - if:
+            condition:
+              lambda: 'return id(lastboot).state == "";'
+            then:
+              - text_sensor.template.publish:
+                  id: lastboot
+                  state: !lambda return id(time_sntp).now().strftime("%Y-%m-%dT%H:%M:%S %Z");
+        - logger.log:
+            level: WARN
+            tag: "system"
+            format: "Synchronized sntp clock"
+
+## ---------------------------------------------------
+## COMPONENT button
+## ---------------------------------------------------
+switch:
+  # reset boot counter
+  - platform: template
+    name: "MiBody Boot Counter reset"
+    id: btnresetcounter
+    turn_on_action:
+      then:
+        - lambda: |-
+            id(boot_counter) = 0;
+            id(bootcounter).publish_state(id(boot_counter));
+        - logger.log:
+            level: WARN
+            tag: "system"
+            format: "${device_name_short} reset boot counter o.k!"
+        - component.update: bootcounter
+
+  # resend data
+  - platform: template
+    name: "MiBody Publish Data"
+    id: btnpublishdata
+    turn_on_action:
+      then:
+        - logger.log:
+            level: DEBUG
+            tag: "system"
+            format: "${device_name_short} start publish data"
+        - text_sensor.template.publish:
+              id: lastmeasuredate
+              state: !lambda return id(time_sntp).now().strftime("%Y-%m-%dT%H:%M:%S %Z");
+        - lambda: |-
+            id(current_weight).publish_state(id(last_weight));
+            delay(100);
+            id(current_impedance).publish_state(id(last_impedance));
+
+  # restart button
+  - platform: restart
+    name: MiBody Neustart
+    id: btnrstart
+
+  # restart save button
+  - platform: safe_mode
+    name: MiBody Restart Save Mode
+    id: btnrestartsave
+    disabled_by_default: true
+
+  # restart device factory settings button
+  - platform: factory_reset
+    name: MiBody Restart Factory
+    id: btnrestartfactory
+    disabled_by_default: true
+
+## ---------------------------------------------------
+## COMPONENT binary sensors
+## ---------------------------------------------------
+binary_sensor:
+  # connection statue mqtt
+  - platform: status
+    name: MiBody Status
+    id: mibodystat
+
+  # connection status mi body scale
+  - platform: template
+    name: MiBody Scale Status
+    id: miscalestat
+    lambda: |-
+      return (id(blerssi).has_state());
+
+## ---------------------------------------------------
+## COMPONENT sensors
+## ---------------------------------------------------
+sensor:
+  # mi body scale data
+  - platform: xiaomi_miscale
+
+    # mac address MiScale2
+    mac_address: ${mac}
+
+    # Clear the impedance information if a weight reading without impedance is received.
+    # clear_impedance: false
+
+    # bodyscale current weight
+    weight:
+      name: Gewicht
+      id: current_weight
+      accuracy_decimals: 2
+      unit_of_measurement: "kg"
+      state_class: total_increasing
+      device_class: "weight"
+      icon: mdi:weight-kilogram
+      retain: true
+      # This automation will be triggered when a new value that has passed through all filters is published
+      on_value:
+        then:
+          - lambda: |-
+              if (id(current_weight).has_state() and id(current_weight).state>40.00){
+                if (id(current_weight).state >= 60 && id(current_weight).state <= 80.00) {
+                  ESP_LOGD("mibody", "Publish MQTT Message: Peter, weight: %.2f", id(current_weight).state);
+                  id(username).publish_state("Peter");
+                } else if (id(current_weight).state >= 45 && id(current_weight).state <= 56) {
+                  ESP_LOGD("mibody", "Publish MQTT Message: Reni, weight: %.2f", id(current_weight).state);
+                  id(username).publish_state("Reni");
+                } else {
+                  ESP_LOGD("mibody", "Publish MQTT Message: Guest, weight: %.2f", id(current_weight).state);
+                  id(username).publish_state("Gast");
+                }
+              }else{
+                ESP_LOGE("mibody", "No Data found!");
+                id(username).publish_state("Unbekannt");
+              }
+
+
+    # bodyscale current impedance
+    impedance:
+      name: Impedance
+      id: current_impedance
+      accuracy_decimals: 0
+      unit_of_measurement: "Ω"
+      state_class: total_increasing
+      icon: mdi:omega
+      retain: true
+      # This automation will be triggered when a new value that has passed through all filters is published
+      on_value:
+        then:
+          if:
+            condition:
+              lambda: return ( ( id(current_weight).has_state() and id(current_weight).state>40.00 ) and ( id(current_impedance).has_state() and id(current_impedance).state>200) ) ;
+            then:
+              - logger.log:
+                  level: DEBUG
+                  tag: "mibody"
+                  format: "${device_name_short}: start decoding weight %.2f and impedance %f for publishing data"
+                  args: ['id(current_weight).state','id(current_impedance).state']
+
+              - mqtt.publish_json:
+                  topic: ${topic_data}
+                  retain: true
+                  payload: !lambda |-
+                    ESP_LOGI("mibody", "Publish MQTT Message, weight: %.2f, impedance: %f", id(current_weight).state, id(current_impedance).state);
+                    id(last_weight) = id(current_weight).state;
+                    id(last_impedance) = id(current_impedance).state;
+                    root["measured"] = id(current_weight).state;
+                    root["calcweight"] = id(current_weight).state;
+                    root["weight"] = id(current_weight).state;
+                    root["impedance"] = id(current_impedance).state;
+                    root["unit"] = "kg";
+                    if (id(current_weight).state >= 60 && id(current_weight).state <= 80.00) {
+                        id(username).publish_state("Peter");
+                        root["user"] = "Peter";
+                    } else if (id(current_weight).state >= 45 && id(current_weight).state <= 56) {
+                        id(username).publish_state("Reni");
+                        root["user"] = "Reni";
+                    } else {
+                        id(username).publish_state("Gast");
+                        root["user"] = "Guest";
+                    }
+                    root["id"] = "${mac}";
+                    root["timestamp"] = id(systime).state;
+                    root["lastscan"] = id(systime).state;
+                    root["scantime"] = id(systime).state;
+                    root["uptime"] = id(mibodyuptime).state;
+                    root["version"] = id(appver).state;
+                    root["application"] = "${application} ${appversion}";
+                    root["attribution"] = "${attribution}";
+              - text_sensor.template.publish:
+                  id: lastmeasuredate
+                  state: !lambda return id(time_sntp).now().strftime("%Y-%m-%dT%H:%M:%S %Z");
+            else:
+              - logger.log:
+                  level: ERROR
+                  tag: "mibody"
+                  format: "${device_name_short}: missing data for publish: weight %.2f,  impedance %f"
+                  args: ['id(current_weight).state','id(current_impedance).state']
+
+
+  # bodyscale care rssi (%)
+  - platform: ble_rssi
+    mac_address: ${mac}
+    name: "MiBody RSSI Qualität"
+    id: blerssi
+    icon: mdi:bluetooth-connect
+    filters:
+      - filter_out: nan
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    unit_of_measurement: "%"
+    entity_category: "diagnostic"
+
+  # Wifi quality RSSI (%)
+  - platform: wifi_signal
+    name: "MiBody WLAN Signal"
+    id: wifisignaldb
+    filters:
+      - filter_out: nan
+      - lambda: return min(max(2 * (x + 100.0), 0.0), 100.0);
+    entity_category: "diagnostic"
+    unit_of_measurement: "%"
+
+  # Device uptime in hours
+  - platform: uptime
+    name: "MiBody Uptime"
+    id: mibodyuptime
+    filters:
+      - filter_out: nan
+      - lambda: return x / 3600;
+    unit_of_measurement: "h"
+    entity_category: "diagnostic"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    icon: mdi:clock-start
+
+  # Device reboot counter
+  - platform: template
+    name: MiBody Anzahl Neustarts
+    id: bootcounter
+    accuracy_decimals: 0
+    entity_category: "diagnostic"
+    state_class: "measurement"
+    lambda: |-
+      return (id(boot_counter));
+
+## ---------------------------------------------------
+## COMPONENT text_sensors
+## ---------------------------------------------------
+text_sensor:
+  # Last boot timestamp (only on webserver)
+  - platform: template
+    name: "MiBody Letzter Neustart um"
+    disabled_by_default: true
+    id: lastboot
+    icon: mdi:clock-start
+
+  # mibodyscale current username
+  - platform: template
+    name: "Name"
+    id: username
+    retain: true
+
+  # mibodyscale current date and time
+  - platform: template
+    name: "Messung vom"
+    id: lastmeasuredate
+    icon: mdi:clock-start
+    retain: true
+    entity_category: "diagnostic"
+
+  # esphome application version
+  - platform: version
+    name: MiBody ESPHome Version
+    id: appver
+    hide_timestamp: true
+    entity_category: "diagnostic"
+    disabled_by_default: true
+
+  # current timestamp device
+  - platform: template
+    name: Timestamp
+    id: systime
+    entity_category: "diagnostic"
+    lambda: return id(time_sntp).now().strftime("%Y-%m-%dT%H:%M:%S %Z");
+
+  # device connected to ssid
+  - platform: wifi_info
+    ssid:
+      name: "MiBody WLAN SSID"
+      id: mibodyssid
+      entity_category: "diagnostic"
+      disabled_by_default: true

@@ -25,6 +25,8 @@ In summary:
 - Other libraries / calculation formulas or also applications show the same (wrong) results.
 
 I only determined correction factors and in the future I will get the same values with the Mi Body Composition Scale 2 as with the other scales.
+
+
 |        Omron               |   TargetScale                         |
 |--------------------------- | --------------------------------------|
 | <img src="../docs/Omron.jpg" alt="Omron" style="zoom: 50%;" /> |<img src="../docs/targetscale.png" alt="TargetScale" style="zoom:33%;" /> |
