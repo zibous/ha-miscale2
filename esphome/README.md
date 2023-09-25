@@ -33,11 +33,10 @@ The ESPHome application for Xiaomi Miscale 2.
 ## ESPHome Dashboard
 ![ESPHome Dashboard](./miscal_dashboard.png)
 
-
 [![](https://img.shields.io/badge/ESPHOME_DASHBOARD-SOURCE-blue?style=for-the-badge)]( https://github.com/zibous/ha-watermeter/tree/master/esphome/webserver)
 
-
 <br>
+
 ## Folder `config`
 All used components and configuration file for Mi Scale 2
 
@@ -48,6 +47,7 @@ Bash scripts to install esphome on docker
 Bash script to compile a esphome application with docker (2022.12.8)
 
 <br>
+
 ## Body Composition Scale 2 (XMTZC05HM) Data to MQTT / Influxdb
 Code to read weight measurements from Xiaomi Body Scales.
 
